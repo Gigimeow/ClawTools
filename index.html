@@ -1,10 +1,254 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>My Free Website</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ClawTools</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f5f5f5;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header, footer {
+      background: #333;
+      color: white;
+      padding: 10px;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0;
+    }
+    nav {
+      background: #444;
+      padding: 10px;
+      display: flex;
+      justify-content: center;
+    }
+    nav a {
+      color: white;
+      margin: 0 15px;
+      text-decoration: none;
+    }
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+    .section {
+      padding: 20px;
+      margin-bottom: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    canvas {
+      display: block;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+    }
+    #footer-label {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      background: #222;
+      color: white;
+      padding: 5px 10px;
+      font-size: 14px;
+    }
+    select, input[type="number"], input[type="color"] {
+      margin: 5px;
+      padding: 5px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Hello, world!</h1>
-  <p>This is my free website without watermarks.</p>
+  <header>
+    <h1>ClawTools</h1>
+  </header>
+
+  <nav>
+    <a href="#tools">Tools</a>
+    <a href="#games">Games</a>
+    <a href="#credits">Credits</a>
+  </nav>
+
+  <div class="content">
+    <!-- Tools Section -->
+    <div class="section" id="tools">
+      <h2>Tools</h2>
+      <!-- Paint App -->
+      <div class="tool">
+        <h3>Paint App</h3>
+        <label>Brush Color: <input type="color" id="brushColor"></label>
+        <label>Brush Size: <input type="number" id="brushSize" min="1" max="50" value="5"></label>
+        <select id="brushType">
+          <option value="round">Round</option>
+          <option value="square">Square</option>
+          <option value="spray">Spray</option>
+          <option value="line">Line</option>
+          <option value="zigzag">Zigzag</option>
+          <option value="dot">Dot</option>
+          <option value="smudge">Smudge</option>
+          <option value="dashed">Dashed</option>
+        </select>
+        <button onclick="clearCanvas()">Clear</button>
+        <button onclick="setEraser()">Eraser</button>
+        <canvas id="paintCanvas" width="400" height="300"></canvas>
+      </div>
+      <!-- Notepad -->
+      <div class="tool">
+        <h3>Notepad</h3>
+        <textarea id="notepad" rows="10" cols="30"></textarea>
+      </div>
+      <!-- Reminder -->
+      <div class="tool">
+        <h3>Reminder</h3>
+        <label for="reminderText">Reminder Text:</label>
+        <input type="text" id="reminderText" placeholder="Enter your reminder" />
+        <button onclick="setReminder()">Set Reminder</button>
+        <p id="reminderMessage"></p>
+      </div>
+      <!-- Calculator -->
+      <div class="tool">
+        <h3>Calculator</h3>
+        <input type="number" id="calcInput1">
+        <input type="number" id="calcInput2">
+        <button onclick="calculate()">Calculate</button>
+        <p id="calcResult"></p>
+      </div>
+    </div>
+
+    <!-- Games Section -->
+    <div class="section" id="games">
+      <h2>Games</h2>
+      <!-- Platformer Game -->
+      <div class="game">
+        <h3>Platformer Game</h3>
+        <canvas id="platformerCanvas" width="400" height="200"></canvas>
+      </div>
+      <!-- Catch Game -->
+      <div class="game">
+        <h3>Catch Game</h3>
+        <canvas id="catchCanvas" width="400" height="300"></canvas>
+      </div>
+      <!-- Clicker Game -->
+      <div class="game">
+        <h3>Clicker Game</h3>
+        <button id="clickerButton">Click Me!</button>
+        <p id="clickerCount">Clicks: 0</p>
+      </div>
+      <!-- Jumping Game -->
+      <div class="game">
+        <h3>Jumping Game</h3>
+        <canvas id="jumpCanvas" width="400" height="200"></canvas>
+      </div>
+      <!-- Memory Game -->
+      <div class="game">
+        <h3>Memory Game</h3>
+        <div id="memoryGame"></div>
+      </div>
+    </div>
+
+    <!-- Credits Section -->
+    <div class="section" id="credits">
+      <h2>Credits</h2>
+      <p>Clawtools made by Gigimeow1019 (HN)</p>
+    </div>
+  </div>
+
+  <footer>
+    <div id="footer-label">©️ Clawtools 2025</div>
+  </footer>
+
+  <script>
+    // Paint App
+    const canvas = document.getElementById('paintCanvas');
+    const ctx = canvas.getContext('2d');
+    let painting = false;
+    let erasing = false;
+
+    function startPaint(e) {
+      painting = true;
+      draw(e);
+    }
+    function endPaint() {
+      painting = false;
+      ctx.beginPath();
+    }
+    function draw(e) {
+      if (!painting) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const size = document.getElementById('brushSize').value;
+      const color = erasing ? '#fff' : document.getElementById('brushColor').value;
+      const type = document.getElementById('brushType').value;
+      ctx.fillStyle = ctx.strokeStyle = color;
+
+      switch (type) {
+        case 'round':
+          ctx.beginPath();
+          ctx.arc(x, y, size / 2, 0, Math.PI * 2);
+          ctx.fill();
+          break;
+        case 'square':
+          ctx.fillRect(x - size / 2, y - size / 2, size, size);
+          break;
+        case 'line':
+          ctx.beginPath();
+          ctx.moveTo(x - size, y - size);
+          ctx.lineTo(x + size, y + size);
+          ctx.stroke();
+          break;
+        case 'spray':
+          for (let i = 0; i < 10; i++) {
+            const offsetX = Math.random() * size - size / 2;
+            const offsetY = Math.random() * size - size / 2;
+            ctx.fillRect(x + offsetX, y + offsetY, 1, 1);
+          }
+          break;
+        case 'zigzag':
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          for (let i = 0; i < size; i += 4) {
+            ctx.lineTo(x + i, y + ((i % 8 === 0) ? 4 : -4));
+          }
+          ctx.stroke();
+          break;
+        case 'dot':
+          ctx.beginPath();
+          ctx.arc(x, y, 1, 0, Math.PI * 2);
+          ctx.fill();
+          break;
+        case 'smudge':
+          ctx.globalAlpha = 0.1;
+          ctx.fillRect(x, y, size, size);
+          ctx.globalAlpha = 1.0;
+          break;
+        case 'dashed':
+          ctx.setLineDash([5, 5]);
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.lineTo(x + size, y + size);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          break;
+      }
+    }
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    function setEraser() {
+      erasing = true;
+    }
+
+    canvas.addEventListener('mousedown', e => { erasing = false; startPaint(e); });
+    canvas.addEventListener('mouseup', endPaint);
+    canvas.addEventListener('mousemove', draw);
+  </script>
 </body>
 </html>
