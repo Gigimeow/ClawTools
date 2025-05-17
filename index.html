@@ -2,1054 +2,195 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Game Menu</title>
+  <title>ClawTools Menu</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #111;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: radial-gradient(ellipse at center, #0f0f0f 0%, #000000 100%);
       color: white;
       height: 100vh;
       overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
     }
 
-    #mainMenu {
-      display: flex;
+    h1, h2 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px cyan;
+    }
+
+    #mainMenu, .submenu, #creditsScreen {
+      display: none;
       flex-direction: column;
       gap: 20px;
       text-align: center;
       align-items: center;
       justify-content: center;
       height: 100%;
-    }
-
-    #changeLogsButton {
+      width: 100%;
       position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 1000;
+      top: 0;
+      left: 0;
+      animation: fadeIn 1s ease forwards;
     }
 
-    button {
-      padding: 10px 20px;
-      font-size: 1.2rem;
+    #mainMenu.active, #gamesMenu.active, #toolsMenu.active, #creditsScreen.active {
+      display: flex;
+    }
+
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      padding: 40px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+      transition: transform 0.3s ease;
+      max-width: 90%;
+    }
+
+    button, .button-link {
+      padding: 12px 24px;
+      font-size: 1.1rem;
       cursor: pointer;
       border: none;
-      border-radius: 10px;
-      background-color: #444;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #00eaff, #007bff);
       color: white;
+      transition: 0.3s ease;
+      box-shadow: 0 0 10px #00f0ff;
+      text-decoration: none;
+      display: inline-block;
     }
 
-    button:hover {
-      background-color: #666;
+    button:hover, .button-link:hover {
+      transform: scale(1.05);
+      background: linear-gradient(135deg, #00faff, #009dff);
+      box-shadow: 0 0 20px #00f0ff;
     }
 
-    #gameContainer {
-      display: none;
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
-      position: relative;
+    .disabled-button {
+      background: #222;
+      box-shadow: none;
+      color: #aaa;
+      cursor: not-allowed;
     }
 
-    .game {
-      display: none;
-      width: 100%;
-      height: 100%;
-    }
-
-    canvas {
-      display: block;
-      margin: auto;
-      background: #000;
+    .disabled-button:hover {
+      transform: none;
     }
 
     #backButton {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 10;
+      margin-top: 20px;
+      background: linear-gradient(135deg, #555, #222);
+      box-shadow: 0 0 10px #444;
     }
 
-    #changeLogsScreen {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      height: 100vh;
+    #backButton:hover {
+      background: linear-gradient(135deg, #777, #333);
     }
 
-    #changeLogsScreen h2 {
-      margin-bottom: 20px;
-    }
-  </style>
-</head>
-<body>
-
-  <!-- Top-left button -->
-  <button id="changeLogsButton" onclick="showChangeLogs()">Change Logs</button>
-
-  <!-- Main Menu -->
-  <div id="mainMenu">
-    <h1>Select a Game</h1>
-    <button onclick="launchGame('football')">Play Football Game</button>
-    <button onclick="launchGame('shooter')">Play Shooter Game</button>
-    <button onclick="launchGame('more_soon')">More coming soon</button>
-  </div>
-
-  <!-- Game Container -->
-  <div id="gameContainer">
-    <button id="backButton" onclick="goBack()">Back to Menu</button>
-
-    <div id="footballGame" class="game"><!DOCTYPE html>                                                                                                                       
-                                                                                                                   
-<html lang="en">                                                                                                                       
-<head>
-  <meta charset="UTF-8">                                                                                                                       
-  <title>2D Football Game HN</title>                                                                                                                       
-  <style>
-    html, body {                                                                                                                       
-      margin: 0;                                                                                                                       
-      padding: 0;                                                                                                                       
-      overflow: hidden;                                                                                                                       
-      background: #0a0;                                                                                                                       
-      height: 100%;                                                                                                                       
-    }
-    canvas {
-      display: block;                                                                                                                       
-    }
-    #gameCanvas {                                                                                                                       
-      background: #0a0;                                                                                                                       
-      border: 4px solid #fff;                                                                                                                       
-      display: none;                                                                                                                       
-    }                                                                                                                        
-    #scoreBoard, #menu, #instructions, #namePrompt, #winScreen, #settingsMenu, #pauseMenu {                                                                                                                       
-      color: white;                                                                                                                       
-      text-align: center;                                                                                                                       
-      font-size: 24px;                                                                                                                       
+    p, a {
+      color: #ccc;
+      font-size: 1rem;
       margin-top: 10px;
-      position: absolute;
-      width: 100%;                                                                                                                       
-    }                                                                                                                     
-    #menu button, #difficultyMenu button, #namePrompt button, #instructions button,                                                                                                                       
-    #winScreen button, #settingsMenu button, #pauseMenu button {                                                                                                                       
-      margin: 10px;                                                                                                                       
-      padding: 10px 20px;                                                                                                                       
-      font-size: 18px;                                                                                                                       
-    }
-    #difficultyMenu {
-      display: none;
-      text-align: center;
-    }                                                                                                                     
-    #copyright {
-      position: fixed;
-      bottom: 10px;
-      right: 10px;
-      color: white;                                                                                                                       
-      font-size: 14px;
-    }                                                                                                                      
-    #version {
-      position: fixed;                                                                                                                       
-      bottom: 10px;                                                                                                                       
-      left: 10px;                                                                                                                       
-      color: white;                                                                                                                       
-      font-size: 14px;                                                                                                                       
-    }                                                                                                                
-    input[type="color"] {                                                                                                                                                                                                                                              
-      width: 60px;                                                                                                                       
-      height: 30px;
-      vertical-align: middle;
-    }                                                                                                                       
-    #pauseButton {
-      position: absolute;                                                                                                                       
-      top: 10px;                                                                                                                       
-      right: 10px;                                                                                                                       
-      z-index: 10;                                                                                                                       
-      font-size: 16px;                                                                                                                       
-      padding: 8px 16px;                                                                                                                       
-      display: none;                                                                                                                       
-    }                                                                                                                
-    #pauseMenu {
-      top: 100px;
-      display: none;
-    }                                                                                                                        
-  </style>                                                                                                                       
-</head>
-<body>                                                                                                        
-<canvas id="gameCanvas" width="1000" height="500"></canvas>                                                                                                                       
-<button id="pauseButton" onclick="togglePause()">Pause</button>                                                                                                                       
-<div id="pauseMenu">
-  <h2>Game Paused</h2>                                                                                                                       
-  <button onclick="resumeGame()">Resume</button>
-  <button onclick="startGame(gameMode)">Start Again</button>                                                                                                                       
-  <button onclick="stopPlaying()">Stop Playing</button>                                                                                                                       
-  <button onclick="openSettingsFromPause()">Settings</button>                                                                                                                       
-</div>
-                                                                                                 
-<div id="scoreBoard" style="display:none;">Player 1: 0 | Player 2: 0</div>                                                                                                                       
-<div id="copyright">© HN</div>                                                                                                                       
-<div id="version">V0.2.1 Beta</div>
-                                                                                                                     
-<div id="namePrompt">
-  <h2>Enter Player Names</h2>                                                                                                                       
-  <input type="text" id="p1name" placeholder="Player 1 Name"><br><br>                                                                                                                       
-  <input type="text" id="p2name" placeholder="Player 2 Name (optional)"><br><br>                                                                                                                       
-  <button onclick="submitNames()">Submit</button>                                                                                                                       
-  <button onclick="skipNames()">Skip</button>                                                                                                                       
-</div>
-
-<div id="menu" style="display:none;">                                                                                                                       
-  <h1>2D Football Game ⚽</h1>                                                                                                                       
-  <button onclick="showDifficulty()">Play</button>                                                                                                                       
-  <button onclick="showInstructions()">Instructions</button>                                                                                                                       
-  <button onclick="openSettings()">Settings</button>                                                                                                                       
-</div>
-
-<div id="difficultyMenu">                                                                                                                       
-  <h2>Select Difficulty</h2>                                                                                                                       
-  <button onclick="startGame('easy')">Easy</button>                                                                                                                       
-  <button onclick="startGame('medium')">Medium</button>                                                                                                                       
-  <button onclick="startGame('hard')">Hard</button>                                                                                                                       
-  <button onclick="startGame('twoPlayer')">Two Player</button>                                                                                                                       
-</div>
-                                                                                                           
-<div id="settingsMenu" style="display:none;">                                                                                                                       
-  <h2>Settings</h2>                                                                                                                       
-  <label>Background Color: <input type="color" id="bgColor" value="#0a0"></label><br><br>                                                                                                                       
-  <label>Player Color: <input type="color" id="playerColor" value="#0000ff"></label><br><br>                                                                                                                       
-  <button onclick="applySettings()">Apply</button>                                                                                                                       
-  <button onclick="backToMenu()">Back</button>                                                                                                                       
-</div>
-
-<div id="instructions" style="display:none;">                                                                                                                       
-  <h2>Instructions</h2>                                                                                                                       
-  <p>This game can be played without WiFi.</p>                                                                                                                       
-  <p>Use the WASD keys to move.</p>                                                                                                                       
-  <p>If playing 2-player (manually), second player uses Arrow keys.</p>         
-  <p>                        .                              </p>  
-  <p>NOTE: The AI will be fixed (also Hard mode is a bit broken)... sorry, HN</p>                                                                                                              
-  <button onclick="backToMenu()">Back</button>                                                                                                                       
-</div>
-
-<div id="winScreen" style="display:none;">                                                                                                                       
-  <h2 id="winnerText"></h2>                                                                                                                       
-  <button onclick="backToMenu()">Play Again</button>                                                                                                                       
-</div>
-
-<script>
-  const canvas = document.getElementById('gameCanvas');                                                                                                                       
-  const ctx = canvas.getContext('2d');                                                                                                                       
-  const keys = {};                                                                                                                       
-  let score1 = 0;                                                                                                                       
-  let score2 = 0;                                                                                                                       
-  let gameMode = 'easy';                                                                                                                       
-  let twoPlayer = false;                                                                                                                       
-  let gameRunning = false;                                                                                                                       
-  let gamePaused = false;                                                                                                                       
-  let player1Name = 'Player 1';                                                                                                                       
-  let player2Name = 'Player 2';                                                                                                                       
-  let bgColor = '#0a0';
-  let playerColor = 'blue';                                                                                                                       
-                                                                                                             
-  const player = { x: 50, y: 220, width: 30, height: 60, color: 'blue', speed: 5 };                                                                                                                       
-  const player2 = { x: 900, y: 220, width: 30, height: 60, color: 'green', speed: 5 };                                                                                                                       
-  const ai = { x: 900, y: 220, width: 30, height: 60, color: 'red', speed: 2 };                                                                                                                       
-  const ball = { x: 500, y: 250, radius: 15, dx: 0, dy: 0, color: 'white' };                                                                                                                       
-  const goal1 = { x: canvas.width - 40, y: 200, width: 10, height: 100, color: 'yellow' };                                                                                                                       
-  const goal2 = { x: 30, y: 200, width: 10, height: 100, color: 'yellow' };                                                                                                                       
-
-  document.addEventListener('keydown', e => keys[e.key] = true);                                                                                                                       
-  document.addEventListener('keyup', e => keys[e.key] = false);                                                                                                                       
-
-  function submitNames() {
-    player1Name = document.getElementById('p1name').value || 'Player 1';                                                                                                                       
-    player2Name = document.getElementById('p2name').value || 'Player 2';
-    document.getElementById('namePrompt').style.display = 'none';                                                                                                                                                                                                                                              
-    document.getElementById('menu').style.display = 'block';                                                                                                                       
-  }
-
-  function skipNames() {                                                                                                                       
-    document.getElementById('namePrompt').style.display = 'none';                                                                                                                       
-    document.getElementById('menu').style.display = 'block';                                                                                                                       
-  }
-
-  function openSettings() {
-    document.getElementById('menu').style.display = 'none';                                                                                                                       
-    document.getElementById('settingsMenu').style.display = 'block';                                                                                                                       
-  }
-                                                                                                                     
-  function openSettingsFromPause() {
-    document.getElementById('pauseMenu').style.display = 'none';                                                                                                                       
-    document.getElementById('settingsMenu').style.display = 'block';                                                                                                                       
-  }
-
-  function applySettings() {
-    bgColor = document.getElementById('bgColor').value;
-    playerColor = document.getElementById('playerColor').value;
-    player.color = playerColor;
-    document.body.style.background = bgColor;
-    canvas.style.background = bgColor;
-    backToMenu();
-  }
-
-  function movePlayer() {
-    if (keys['w']) player.y -= player.speed;                                                                                                                       
-    if (keys['s']) player.y += player.speed;                                                                                                                       
-    if (keys['a']) player.x -= player.speed;                                                                                                                       
-    if (keys['d']) player.x += player.speed;                                                                                                                       
-
-    if (twoPlayer) {
-      if (keys['ArrowUp']) player2.y -= player2.speed;                                                                                                                       
-      if (keys['ArrowDown']) player2.y += player2.speed;                                                                                                                       
-      if (keys['ArrowLeft']) player2.x -= player2.speed;                                                                                                                       
-      if (keys['ArrowRight']) player2.x += player2.speed;                                                                                                                       
     }
 
-    player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));                                                                                                                       
-    player.y = Math.max(0, Math.min(canvas.height - player.height, player.y));                                                                                                                       
-    if (twoPlayer) {
-      player2.x = Math.max(0, Math.min(canvas.width - player2.width, player2.x));                                                                                                                       
-      player2.y = Math.max(0, Math.min(canvas.height - player2.height, player2.y));                                                                                                                       
-    }
-  }
-
-  function moveAI() {                                                                                                                       
-    if (twoPlayer) return;
-    const defenseMode = ball.x > canvas.width / 2;                                                                                                                       
-    const targetX = defenseMode ? ball.x - 20 : goal2.x + goal2.width;
-    const targetY = ball.y;                                                                                                                                                                                                                                              
-                                                                                                                      
-    if (ai.x > targetX) ai.x -= ai.speed;                                                                                                                       
-    if (ai.x < targetX) ai.x += ai.speed;                                                                                                                       
-    if (ai.y > targetY) ai.y -= ai.speed;                                                                                                                       
-    if (ai.y < targetY) ai.y += ai.speed;                                                                                                                       
-
-    // Avoid corners
-    if ((ball.x < 100 || ball.x > canvas.width - 100) && (ball.y < 50 || ball.y > canvas.height - 50)) {
-      ball.dx = (canvas.width / 2 - ball.x) * 0.05;
-      ball.dy = (canvas.height / 2 - ball.y) * 0.05;
-    }                                                                                                                       
-  }
-
-  function moveBall() {
-    ball.x += ball.dx;
-    ball.y += ball.dy;                                                                                                                       
-    ball.dx *= 0.98;
-    ball.dy *= 0.98;
-
-    if (ball.x - ball.radius < 0) {
-      ball.x = ball.radius;
-      ball.dx *= -1;
-    }
-    if (ball.x + ball.radius > canvas.width) {
-      ball.x = canvas.width - ball.radius;                                                                                                                       
-      ball.dx *= -1;
-    }
-    if (ball.y - ball.radius < 0) {
-      ball.y = ball.radius;                                                                                                                       
-      ball.dy *= -1;
-    }
-    if (ball.y + ball.radius > canvas.height) {                                                                                                                       
-      ball.y = canvas.height - ball.radius;                                                                                                                       
-      ball.dy *= -1;
-    }
-  }
-                                                                                                                                       
-  function detectCollisionWith(p) {
-    const distX = (p.x + p.width / 2) - ball.x;                                                                                                                       
-    const distY = (p.y + p.height / 2) - ball.y;                                                                                                                       
-    const distance = Math.sqrt(distX * distX + distY * distY);
-    if (distance < ball.radius + Math.max(p.width, p.height) / 2) {                                                                                                                       
-      const angle = Math.atan2(distY, distX);
-      ball.dx = -Math.cos(angle) * 5;
-      ball.dy = -Math.sin(angle) * 5;
-    }
-  }
-
-  function checkGoal() {
-    if (ball.x + ball.radius > goal1.x && ball.y > goal1.y && ball.y < goal1.y + goal1.height) {
-      score1++;
-      resetBall();
-    }
-    if (ball.x - ball.radius < goal2.x + goal2.width && ball.y > goal2.y && ball.y < goal2.y + goal2.height) {
-      score2++;
-      resetBall();
-    }
-    document.getElementById('scoreBoard').innerText = player1Name + ': ' + score1 + ' | ' + player2Name + ': ' + score2;
-
-    if (score1 >= 10 || score2 >= 10) {
-      gameRunning = false;
-      document.getElementById('winScreen').style.display = 'block';
-      document.getElementById('pauseButton').style.display = 'none';
-      document.getElementById('winnerText').innerText = (score1 > score2 ? player1Name : player2Name) + ' Won!';
-    }
-  }
-
-  function resetBall() {
-    ball.x = canvas.width / 2;
-    ball.y = canvas.height / 2;
-    ball.dx = 0;
-    ball.dy = 0;
-  }
-
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                                                                                                                          
-    ctx.fillStyle = goal1.color;
-    ctx.fillRect(goal1.x, goal1.y, goal1.width, goal1.height);
-    ctx.fillStyle = goal2.color;
-    ctx.fillRect(goal2.x, goal2.y, goal2.width, goal2.height);
-
-    ctx.fillStyle = player.color;
-    ctx.fillRect(player.x, player.y, player.width, player.height);
-
-    if (twoPlayer) {
-      ctx.fillStyle = player2.color;
-      ctx.fillRect(player2.x, player2.y, player2.width, player2.height);
-    } else {
-      ctx.fillStyle = ai.color;
-      ctx.fillRect(ai.x, ai.y, ai.width, ai.height);
+    a {
+      color: #00d0ff;
     }
 
-    ctx.beginPath();
-    ctx.fillStyle = ball.color;
-    ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  function gameLoop() {
-    if (!gameRunning || gamePaused) return;
-    movePlayer();
-    moveAI();
-    moveBall();
-    detectCollisionWith(player);
-    if (twoPlayer) detectCollisionWith(player2);
-    else detectCollisionWith(ai);
-    checkGoal();
-    draw();
-    requestAnimationFrame(gameLoop);
-  }
-                                                                                                                       
-  function togglePause() {
-    gamePaused = !gamePaused;
-    document.getElementById('pauseMenu').style.display = gamePaused ? 'block' : 'none';
-    if (!gamePaused) gameLoop();
-  }
-
-  function resumeGame() {
-    togglePause();
-  }
-                                                                                                                       
-  function stopPlaying() {
-    gameRunning = false;
-    gamePaused = false;
-    document.getElementById('pauseMenu').style.display = 'none';
-    backToMenu();
-  }
-
-  function showInstructions() {
-    document.getElementById('menu').style.display = 'none';
-    document.getElementById('instructions').style.display = 'block';
-  }
-
-  function backToMenu() {
-    document.getElementById('menu').style.display = 'block';
-    document.getElementById('instructions').style.display = 'none';
-    document.getElementById('difficultyMenu').style.display = 'none';
-    document.getElementById('gameCanvas').style.display = 'none';
-    document.getElementById('scoreBoard').style.display = 'none';
-    document.getElementById('winScreen').style.display = 'none';
-    document.getElementById('settingsMenu').style.display = 'none';
-    document.getElementById('pauseButton').style.display = 'none';
-    document.getElementById('pauseMenu').style.display = 'none';
-  }
-                                                                                                                       
-  function showDifficulty() {
-    document.getElementById('menu').style.display = 'none';
-    document.getElementById('difficultyMenu').style.display = 'block';
-  }
-
-  function startGame(mode) {
-    gameMode = mode;
-    twoPlayer = (mode === 'twoPlayer');
-    document.getElementById('menu').style.display = 'none';
-    document.getElementById('difficultyMenu').style.display = 'none';
-    document.getElementById('gameCanvas').style.display = 'block';
-    document.getElementById('scoreBoard').style.display = 'block';
-    document.getElementById('pauseButton').style.display = 'block';
-    document.getElementById('winScreen').style.display = 'none';
-    document.getElementById('pauseMenu').style.display = 'none';
-    score1 = 0;
-    score2 = 0;
-    gameRunning = true;
-    gamePaused = false;
-                                                                                                                       
-    if (mode === 'easy') ai.speed = 1;
-    if (mode === 'medium') ai.speed = 2;
-    if (mode === 'hard') ai.speed = 4;
-
-    resetBall();
-    gameLoop();
-  }
-</script>
-</body>
-</html>
-
-                                                                                                                       
-.
-                                                                                                                       
-
-    </div>
-
-    <div id="shooterGame" class="game">
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Super Shooter</title>
-  <style>
-    * { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; overflow: hidden; font-family: sans-serif; background: #000; }
-    canvas { display: block; background: #111; margin: auto; }
-
-    .menu {
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      display: none;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      background-color: rgba(0,0,0,0.8);
-      color: white;
-      font-size: 24px;
-      z-index: 10;
+    a:hover {
+      text-decoration: underline;
     }
 
-    button {
-      margin: 10px;
-      padding: 12px 24px;
-      font-size: 20px;
-      background-color: #444;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    button:hover { background-color: #666; }
-
-    #ui, #coinDisplay, #topShopBtn {
-      position: absolute;
-      color: white;
-      font-size: 20px;
-      z-index: 5;
-    }
-
-    #ui { top: 10px; left: 10px; display: none; }
-    #coinDisplay { top: 10px; right: 10px; display: none; }
-    #topShopBtn {
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: none;
+    @media (max-width: 600px) {
+      h1, h2 {
+        font-size: 2rem;
+      }
+      .glass-panel {
+        padding: 20px;
+      }
     }
   </style>
-</head>
-<body>
-<canvas id="game" width="800" height="600"></canvas>
-
-<!-- Main Menu -->
-<div id="mainMenu" class="menu" style="display: flex;">
-  <h1>Super Shooter</h1>
-  <button onclick="startGame()">Start Game</button>
-</div>
-
-<!-- Pause Menu -->
-<div id="pauseMenu" class="menu">
-  <h1>Paused</h1>
-  <button onclick="resumeGame()">Resume</button>
-  <button onclick="location.reload()">Main Menu</button>
-</div>
-
-<!-- In-Game Shop -->
-<div id="gameShop" class="menu">
-  <h1>In-Game Shop</h1>
-  <p>Change Player Color - 50 Coins</p>
-  <button onclick="buyColor('cyan')">Cyan</button>
-  <button onclick="buyColor('lime')">Lime</button>
-  <button onclick="buyColor('yellow')">Yellow</button>
-  <button onclick="closeGameShop()">Close</button>
-</div>
-
-<!-- UI -->
-<div id="ui">Score: <span id="score">0</span></div>
-<div id="coinDisplay">Coins: <span id="coins">0</span></div>
-<div id="topShopBtn"><button onclick="openGameShop()">Shop</button></div>
-
-<script>
-  const canvas = document.getElementById("game");
-  const ctx = canvas.getContext("2d");
-
-  const player = { x: 400, y: 300, size: 20, speed: 3 };
-  let keys = {};
-  let mouse = { x: 0, y: 0 };
-  let bullets = [];
-  let enemies = [];
-  let isPlaying = false;
-  let isPaused = false;
-  let score = 0;
-  let coins = 0;
-  let playerColor = "cyan";
-
-  function startGame() {
-    document.getElementById("mainMenu").style.display = "none";
-    document.getElementById("ui").style.display = "block";
-    document.getElementById("coinDisplay").style.display = "block";
-    document.getElementById("topShopBtn").style.display = "block";
-    isPlaying = true;
-    player.x = 400;
-    player.y = 300;
-    score = 0;
-    coins = 0;
-    bullets = [];
-    enemies = [];
-    spawnEnemy();
-    gameLoop();
-    setInterval(spawnEnemy, 1500);
-  }
-
-  function pauseGame() {
-    if (!isPaused) {
-      isPaused = true;
-      document.getElementById("pauseMenu").style.display = "flex";
-    }
-  }
-
-  function resumeGame() {
-    isPaused = false;
-    document.getElementById("pauseMenu").style.display = "none";
-    gameLoop();
-  }
-
-  function openGameShop() {
-    isPaused = true;
-    document.getElementById("gameShop").style.display = "flex";
-  }
-
-  function closeGameShop() {
-    isPaused = false;
-    document.getElementById("gameShop").style.display = "none";
-    gameLoop();
-  }
-
-  function buyColor(color) {
-    if (coins >= 50) {
-      coins -= 50;
-      playerColor = color;
-      document.getElementById("coins").innerText = coins;
-    } else {
-      alert("Not enough coins!");
-    }
-  }
-
-  function spawnEnemy() {
-    if (!isPlaying) return;
-    const edge = Math.floor(Math.random() * 4);
-    let x, y;
-    const size = 20;
-    if (edge === 0) { x = 0; y = Math.random() * canvas.height; }
-    else if (edge === 1) { x = canvas.width; y = Math.random() * canvas.height; }
-    else if (edge === 2) { x = Math.random() * canvas.width; y = 0; }
-    else { x = Math.random() * canvas.width; y = canvas.height; }
-    enemies.push({ x, y, size, speed: 1.5 });
-  }
-
-  function shootBullet() {
-    const angle = Math.atan2(mouse.y - player.y, mouse.x - player.x);
-    const speed = 6;
-    bullets.push({
-      x: player.x,
-      y: player.y,
-      dx: Math.cos(angle) * speed,
-      dy: Math.sin(angle) * speed,
-      width: 4,
-      height: 2
-    });
-  }
-
-  function gameLoop() {
-    if (!isPlaying || isPaused) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Movement
-    if (keys["w"]) player.y -= player.speed;
-    if (keys["s"]) player.y += player.speed;
-    if (keys["a"]) player.x -= player.speed;
-    if (keys["d"]) player.x += player.speed;
-
-    // Bullets
-    bullets.forEach((b, i) => {
-      b.x += b.dx;
-      b.y += b.dy;
-      if (b.x < 0 || b.x > canvas.width || b.y < 0 || b.y > canvas.height) bullets.splice(i, 1);
-    });
-
-    // Enemies
-    enemies.forEach((e, ei) => {
-      const angle = Math.atan2(player.y - e.y, player.x - e.x);
-      e.x += Math.cos(angle) * e.speed;
-      e.y += Math.sin(angle) * e.speed;
-
-      const dist = Math.hypot(player.x - e.x, player.y - e.y);
-      if (dist < player.size / 2 + e.size / 2) {
-        isPlaying = false;
-        alert("Game Over! Final Score: " + score);
-        location.reload();
-      }
-
-      bullets.forEach((b, bi) => {
-        if (b.x > e.x - e.size && b.x < e.x + e.size && b.y > e.y - e.size && b.y < e.y + e.size) {
-          enemies.splice(ei, 1);
-          bullets.splice(bi, 1);
-          score += 10;
-          coins += 10;
-          document.getElementById("score").innerText = score;
-          document.getElementById("coins").innerText = coins;
-        }
-      });
-    });
-
-    // Draw player
-    ctx.fillStyle = playerColor;
-    ctx.beginPath();
-    ctx.arc(player.x, player.y, player.size / 2, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Draw bullets
-    ctx.fillStyle = "blue";
-    bullets.forEach(b => {
-      ctx.fillRect(b.x, b.y, b.width, b.height);
-    });
-
-    // Draw enemies
-    ctx.fillStyle = "red";
-    enemies.forEach(e => {
-      ctx.beginPath();
-      ctx.arc(e.x, e.y, e.size / 2, 0, Math.PI * 2);
-      ctx.fill();
-    });
-
-    requestAnimationFrame(gameLoop);
-  }
-
-  document.addEventListener("keydown", e => {
-    keys[e.key.toLowerCase()] = true;
-    if (e.key === "Escape") pauseGame();
-  });
-
-  document.addEventListener("keyup", e => {
-    keys[e.key.toLowerCase()] = false;
-  });
-
-  canvas.addEventListener("mousemove", e => {
-    const rect = canvas.getBoundingClientRect();
-    mouse.x = e.clientX - rect.left;
-    mouse.y = e.clientY - rect.top;
-  });
-
-  canvas.addEventListener("click", () => {
-    if (isPlaying && !isPaused) shootBullet();
-  });
-</script>
-</body>
-</html>
-
-    </div>
-
-    <div id="more_soon" class="game">
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ClawTools</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f4f4f4; }
-    header { background: #333; color: white; padding: 1rem; text-align: center; }
-    nav { text-align: center; margin-top: 1rem; }
-    nav button { margin: 0.25rem; padding: 0.5rem 1rem; font-size: 1rem; cursor: pointer; }
-    #app-container { padding: 1rem; }
-    .hidden { display: none; }
-    canvas { border: 1px solid #000; }
-    textarea { width: 100%; height: 300px; }
-    input, select { margin: 0.5rem; }
-    ul { padding-left: 1.5rem; }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>ClawTools</h1>
-    <nav>
-      <button onclick="openApp('paint')">Paint</button>
-      <button onclick="openApp('notepad')">Notepad</button>
-      <button onclick="openApp('reminder')">Reminders</button>
-      <button onclick="openApp('calculator')">Calculator</button>
-      <button onclick="openApp('todo')">To-Do List</button>
-      <button onclick="openApp('clock')">Clock</button>
-      <button onclick="openApp('minigame1')">Catch Game</button>
-      <button onclick="openApp('minigame2')">Clicker Game</button>
-    </nav>
-  </header>
-
-  <main id="app-container">
-    <div id="paint" class="hidden">
-      <h2>Paint</h2>
-      <label>Color: <input type="color" id="colorPicker" /></label>
-      <label>Size: <input type="range" id="brushSize" min="1" max="20" value="3" /></label>
-      <label>Brush: 
-        <select id="brushType">
-          <option value="round">Round</option>
-          <option value="square">Square</option>
-        </select>
-      </label>
-      <br />
-      <canvas id="paintCanvas" width="500" height="400"></canvas>
-    </div>
-
-    <div id="notepad" class="hidden">
-      <h2>Notepad</h2>
-      <textarea placeholder="Type your notes here..."></textarea>
-    </div>
-
-    <div id="reminder" class="hidden">
-      <h2>Reminders</h2>
-      <input type="text" id="reminderText" placeholder="Enter reminder" />
-      <input type="datetime-local" id="reminderTime" />
-      <button onclick="setReminder()">Set Reminder</button>
-      <ul id="reminderList"></ul>
-    </div>
-
-    <div id="calculator" class="hidden">
-      <h2>Calculator</h2>
-      <input type="text" id="calcDisplay" readonly />
-      <br />
-      <div>
-        <button onclick="calcInput('1')">1</button>
-        <button onclick="calcInput('2')">2</button>
-        <button onclick="calcInput('3')">3</button>
-        <button onclick="calcInput('+')">+</button><br />
-        <button onclick="calcInput('4')">4</button>
-        <button onclick="calcInput('5')">5</button>
-        <button onclick="calcInput('6')">6</button>
-        <button onclick="calcInput('-')">-</button><br />
-        <button onclick="calcInput('7')">7</button>
-        <button onclick="calcInput('8')">8</button>
-        <button onclick="calcInput('9')">9</button>
-        <button onclick="calcInput('*')">*</button><br />
-        <button onclick="calcInput('0')">0</button>
-        <button onclick="calcInput('.')">.</button>
-        <button onclick="calcInput('=')">=</button>
-        <button onclick="calcInput('/')">/</button>
-        <button onclick="calcInput('C')">C</button>
-      </div>
-    </div>
-
-    <div id="todo" class="hidden">
-      <h2>To-Do List</h2>
-      <input type="text" id="todoInput" placeholder="New Task" />
-      <button onclick="addTodo()">Add</button>
-      <ul id="todoList"></ul>
-    </div>
-
-    <div id="clock" class="hidden">
-      <h2>Clock</h2>
-      <div id="clockDisplay"></div>
-    </div>
-
-    <div id="minigame1" class="hidden">
-      <h2>Catch Game</h2>
-      <p>Click the moving square!</p>
-      <div id="gameBox" style="width:300px;height:300px;border:1px solid #000;position:relative;"></div>
-    </div>
-
-    <div id="minigame2" class="hidden">
-      <h2>Clicker Game</h2>
-      <button onclick="clickMe()">Click Me!</button>
-      <p>Score: <span id="clickScore">0</span></p>
-    </div>
-  </main>
 
   <script>
-    const apps = ['paint', 'notepad', 'reminder', 'calculator', 'todo', 'clock', 'minigame1', 'minigame2'];
-
-    function openApp(appId) {
-      apps.forEach(id => document.getElementById(id).classList.add('hidden'));
-      document.getElementById(appId).classList.remove('hidden');
-    }
-
-    // Paint
-    const canvas = document.getElementById('paintCanvas');
-    const ctx = canvas ? canvas.getContext('2d') : null;
-    let painting = false;
-
-    if (canvas) {
-      canvas.addEventListener('mousedown', () => painting = true);
-      canvas.addEventListener('mouseup', () => {
-        painting = false;
-        ctx.beginPath();
-      });
-      canvas.addEventListener('mousemove', draw);
-
-      function draw(e) {
-        if (!painting) return;
-        ctx.lineWidth = document.getElementById('brushSize').value;
-        ctx.lineCap = document.getElementById('brushType').value;
-        ctx.strokeStyle = document.getElementById('colorPicker').value;
-        ctx.lineTo(e.offsetX, e.offsetY);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(e.offsetX, e.offsetY);
+    // Disable right-click and dev tools
+    window.addEventListener('contextmenu', e => e.preventDefault());
+    window.addEventListener('keydown', function(e) {
+      if (
+        e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J" || e.key === "C")) ||
+        (e.ctrlKey && e.key === "U")
+      ) {
+        e.preventDefault();
+        return false;
       }
-    }
+    });
 
-    // Reminder
-    function setReminder() {
-      const text = document.getElementById('reminderText').value;
-      const time = new Date(document.getElementById('reminderTime').value);
-      const list = document.getElementById('reminderList');
-      const li = document.createElement('li');
-      li.textContent = `${text} - ${time.toLocaleString()}`;
-      list.appendChild(li);
-
-      const now = new Date();
-      const timeout = time - now;
-      if (timeout > 0) {
-        setTimeout(() => alert(`Reminder: ${text}`), timeout);
-      }
-    }
-
-    // Calculator
-    let calcExpression = '';
-    function calcInput(value) {
-      if (value === 'C') calcExpression = '';
-      else if (value === '=') {
-        try {
-          calcExpression = eval(calcExpression).toString();
-        } catch {
-          calcExpression = 'Error';
-        }
-      } else {
-        calcExpression += value;
-      }
-      document.getElementById('calcDisplay').value = calcExpression;
-    }
-
-    // To-Do
-    function addTodo() {
-      const input = document.getElementById('todoInput');
-      const task = input.value.trim();
-      if (!task) return;
-      const li = document.createElement('li');
-      li.textContent = task;
-      li.onclick = () => li.remove();
-      document.getElementById('todoList').appendChild(li);
-      input.value = '';
-    }
-
-    // Clock
-    function updateClock() {
-      const now = new Date();
-      document.getElementById('clockDisplay').textContent = now.toLocaleTimeString();
-    }
-    setInterval(updateClock, 1000);
-
-    // Mini Game 1: Catch the box
-    const gameBox = document.getElementById('gameBox');
-    const square = document.createElement('div');
-    square.style.width = '30px';
-    square.style.height = '30px';
-    square.style.background = 'red';
-    square.style.position = 'absolute';
-    gameBox?.appendChild(square);
-    square.addEventListener('click', () => moveSquare());
-
-    function moveSquare() {
-      const x = Math.random() * 270;
-      const y = Math.random() * 270;
-      square.style.left = `${x}px`;
-      square.style.top = `${y}px`;
-    }
-    setInterval(moveSquare, 1000);
-
-    // Mini Game 2: Clicker
-    let score = 0;
-    function clickMe() {
-      score++;
-      document.getElementById('clickScore').textContent = score;
-    }
-  </script>
-</body>
-</html>
-
-    </div>
-  </div>
-
-  <!-- Change Logs Screen -->
-  <div id="changeLogsScreen">
-    <h2>Change Logs</h2>
-    <p>N/A</p>
-    <button onclick="closeChangeLogs()">Back to Menu</button>
-  </div>
-
-  <script>
-    function launchGame(game) {
-      document.getElementById("mainMenu").style.display = "none";
-      document.getElementById("changeLogsScreen").style.display = "none";
-      document.getElementById("changeLogsButton").style.display = "none"; // Hide button
-      document.getElementById("gameContainer").style.display = "block";
-
-      document.querySelectorAll(".game").forEach(el => el.style.display = "none");
-
-      if (typeof stopFootballGame === "function") stopFootballGame();
-      if (typeof stopShooterGame === "function") stopShooterGame();
-
-      if (game === "football") {
-        document.getElementById("footballGame").style.display = "block";
-        if (typeof startFootballGame === "function") startFootballGame();
-      } else if (game === "shooter") {
-        document.getElementById("shooterGame").style.display = "block";
-        if (typeof startShooterGame === "function") startShooterGame();
-      } else if (game === "more_soon") {
-        document.getElementById("more_soon").style.display = "block";
-      }
+    function showMenu(menuId) {
+      document.getElementById("mainMenu").classList.remove("active");
+      document.getElementById("gamesMenu").classList.remove("active");
+      document.getElementById("toolsMenu").classList.remove("active");
+      document.getElementById("creditsScreen").classList.remove("active");
+      document.getElementById(menuId).classList.add("active");
     }
 
     function goBack() {
-      document.getElementById("gameContainer").style.display = "none";
-      document.getElementById("changeLogsScreen").style.display = "none";
-      document.getElementById("mainMenu").style.display = "flex";
-      document.getElementById("changeLogsButton").style.display = "block"; // Show button
-
-      document.querySelectorAll(".game").forEach(el => el.style.display = "none");
-
-      if (typeof stopFootballGame === "function") stopFootballGame();
-      if (typeof stopShooterGame === "function") stopShooterGame();
-    }
-
-    function showChangeLogs() {
-      document.getElementById("mainMenu").style.display = "none";
-      document.getElementById("gameContainer").style.display = "none";
-      document.getElementById("changeLogsScreen").style.display = "flex";
-      document.getElementById("changeLogsButton").style.display = "none"; // Hide button
-    }
-
-    function closeChangeLogs() {
-      document.getElementById("changeLogsScreen").style.display = "none";
-      document.getElementById("mainMenu").style.display = "flex";
-      document.getElementById("changeLogsButton").style.display = "block"; // Show button
+      document.getElementById("gamesMenu").classList.remove("active");
+      document.getElementById("toolsMenu").classList.remove("active");
+      document.getElementById("creditsScreen").classList.remove("active");
+      document.getElementById("mainMenu").classList.add("active");
     }
   </script>
+</head>
+<body>
+  <!-- Main Menu -->
+  <div id="mainMenu" class="glass-panel active">
+    <h1>ClawTools Menu</h1>
+    <button onclick="showMenu('gamesMenu')">🎮 Games</button>
+    <button onclick="showMenu('toolsMenu')">🛠️ Tools</button>
+    <button onclick="showMenu('creditsScreen')">⭐ Credits</button>
+    <p>Visit my friend's website of fun games: <a href="https://gamesrf.neocities.org/" target="_blank">Gamesrf</a></p>
+  </div>
 
+  <!-- Games Menu -->
+  <div id="gamesMenu" class="submenu glass-panel">
+    <h2>🎮 Select a Game</h2>
+    <a class="button-link" href="https://gigimeows-channels.neocities.org/footballgame" target="_blank">⚽ Football Game</a>
+    <a class="button-link" href="https://gigimeows-channels.neocities.org/shootergame" target="_blank">🔫 Shooter Game</a>
+    <a class="button-link" href="https://gigimeows-channels.neocities.org/platformergame" target="_blank">🕹️ Platformer Game</a>
+    <div class="button-link disabled-button">🧪 More coming soon!</div>
+    <button id="backButton" onclick="goBack()">⬅️ Back</button>
+  </div>
+
+  <!-- Tools Menu -->
+  <div id="toolsMenu" class="submenu glass-panel">
+    <h2>🛠️ Select a Tool</h2>
+    <a class="button-link" href="https://gigimeows-channels.neocities.org/paint" target="_blank">🎨 Paint</a>
+    <a class="button-link" href="https://gigimeows-channels.neocities.org/notepad" target="_blank">📝 Notepad</a>
+    <a class="button-link" href="https://gigimeows-channels.neocities.org/calculator" target="_blank">🧮 Calculator</a>
+    <button id="backButton" onclick="goBack()">⬅️ Back</button>
+  </div>
+
+  <!-- Credits Screen -->
+  <div id="creditsScreen" class="submenu glass-panel">
+    <h2>⭐ Credits</h2>
+    <p>ClawTools made by <strong>Gigimeow1019</strong></p>
+    <button onclick="goBack()">⬅️ Back</button>
+  </div>
 </body>
 </html>
