@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>History Quiz - Password Protected</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    user-select: none;
+    position: relative;
+    min-height: 100vh;
+  }
+  #app {
+    max-width: 700px;
+    margin: 50px auto 80px auto; /* leave bottom space for footer */
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    padding: 20px;
+  }
+  h1 {
+    font-size: 2rem;
+  }
+  .btn, .option-btn {
+    display: block;
+    margin: 15px auto;
+    padding: 10px 25px;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 8px;
+    background: #4285f4;
+    color: white;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    width: 60%;
+  }
+  .btn:hover, .option-btn:hover {
+    background: #3367d6;
+  }
+  input[type="password"] {
+    font-size: 1.2rem;
+    padding: 10px;
+    width: 200px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    margin-bottom: 15px;
+  }
+  .question {
+    font-size: 1.2rem;
+    margin: 20px 0;
+  }
+  .fade {
+    animation: fadeIn 0.5s;
+  }
+  @keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+  }
+  #footer {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    color: red;
+    font-size: 14px;
+    font-weight: bold;
+    max-width: 95vw;
+    user-select: text;
+  }
+</style>
+</head>
+<body>
+
+<div id="app" class="fade">
+  <h1>Enter Password to Access Quiz</h1>
+  <input type="password" id="passwordInput" placeholder="Enter password" />
+  <button class="btn" onclick="checkPassword()">Submit</button>
+  <p id="errorMsg" style="color: red; font-weight: bold;"></p>
+</div>
+
+<div id="footer">©️HNClawtools, THIS IS A PREVIEW AND IS NOT EXPECTED TO BE PERFECT, THIS IS UNRELEASED.</div>
+
+<script>
+  // Disable right-click context menu
+  window.addEventListener('contextmenu', e => e.preventDefault());
+
+  const password = "1234";
+  const app = document.getElementById('app');
+  const errorMsg = document.getElementById('errorMsg');
+
+  const quizzes = {
+    edward: {
+      title: "King Edward I",
+      questions: [
+        { q: "When did Edward I become king?", options: ["1272", "1307", "1295", "1284"], correct: "1272" },
+        { q: "What was Edward I's nickname?", options: ["The Confessor", "Longshanks", "The Conqueror", "The Lionheart"], correct: "Longshanks" },
+        { q: "Which country did Edward I conquer?", options: ["Wales", "France", "Scotland", "Ireland"], correct: "Wales" },
+        { q: "What was built to control Wales?", options: ["Castles", "Churches", "Bridges", "Walls"], correct: "Castles" },
+        { q: "When was the Statute of Rhuddlan passed?", options: ["1284", "1290", "1275", "1300"], correct: "1284" },
+        { q: "Which group did Edward expel in 1290?", options: ["Jews", "Normans", "Vikings", "Saxons"], correct: "Jews" },
+        { q: "What did Edward I create in 1295?", options: ["Model Parliament", "Doomsday Book", "House of Lords", "Commonwealth"], correct: "Model Parliament" },
+        { q: "Edward fought wars in which country?", options: ["Scotland", "Spain", "France", "Ireland"], correct: "Scotland" },
+        { q: "Who was the Scottish rebel during Edward's reign?", options: ["William Wallace", "Robert Bruce", "Mary Queen", "James VI"], correct: "William Wallace" },
+        { q: "What year did Edward I die?", options: ["1307", "1297", "1310", "1286"], correct: "1307" },
+        { q: "Edward was the first king to be called what?", options: ["Prince of Wales", "King of Britain", "Lord Protector", "High King"], correct: "Prince of Wales" },
+        { q: "Which castle did Edward I build?", options: ["Caernarfon", "Windsor", "Edinburgh", "Dover"], correct: "Caernarfon" },
+        { q: "What language did Edward I speak?", options: ["French", "English", "Latin", "Welsh"], correct: "French" },
+        { q: "Who succeeded Edward I?", options: ["Edward II", "Richard II", "Henry III", "John"], correct: "Edward II" },
+        { q: "What was Edward I’s main legacy?", options: ["Parliament", "Religion", "Exploration", "Trade"], correct: "Parliament" },
+        { q: "Edward I reformed what?", options: ["Law", "Trade", "Education", "Religion"], correct: "Law" },
+        { q: "What religion was Edward I?", options: ["Christian", "Pagan", "Jewish", "Muslim"], correct: "Christian" },
+        { q: "Which document inspired Edward’s government?", options: ["Magna Carta", "Domesday Book", "Bill of Rights", "Treaty of Paris"], correct: "Magna Carta" },
+        { q: "Edward I ruled during which century?", options: ["13th", "14th", "12th", "15th"], correct: "13th" },
+        { q: "What did Edward I fear?", options: ["Rebellion", "Disease", "Floods", "Invasion"], correct: "Rebellion" }
+      ]
+    },
+    john: {
+      title: "King John",
+      questions: [
+        { q: "When did King John reign?", options: ["1199–1216", "1215–1230", "1170–1190", "1220–1240"], correct: "1199–1216" },
+        { q: "What famous charter did John sign?", options: ["Magna Carta", "Bill of Rights", "Treaty of Versailles", "Petition of Right"], correct: "Magna Carta" },
+        { q: "Why was John unpopular?", options: ["High taxes", "Free land", "Religious reforms", "Peace treaties"], correct: "High taxes" },
+        { q: "Who was John's famous brother?", options: ["Richard the Lionheart", "Edward I", "Henry II", "William the Conqueror"], correct: "Richard the Lionheart" },
+        { q: "Which war did John lose?", options: ["Norman War", "French War", "Hundred Years War", "Wars of the Roses"], correct: "French War" },
+        { q: "Which land did John lose?", options: ["Normandy", "Ireland", "Scotland", "Wales"], correct: "Normandy" },
+        { q: "When was Magna Carta signed?", options: ["1215", "1199", "1220", "1205"], correct: "1215" },
+        { q: "What river was Magna Carta signed by?", options: ["Runnymede", "Thames", "Severn", "Avon"], correct: "Runnymede" },
+        { q: "What group forced John to sign Magna Carta?", options: ["Barons", "Peasants", "Clergy", "Knights"], correct: "Barons" },
+        { q: "What religion was King John?", options: ["Christian", "Muslim", "Jewish", "Pagan"], correct: "Christian" },
+        { q: "Who became king after John?", options: ["Henry III", "Edward I", "Richard II", "John II"], correct: "Henry III" },
+        { q: "What animal is King John often linked with?", options: ["Snake", "Lion", "Dragon", "Wolf"], correct: "Snake" },
+        { q: "What did John do to barons?", options: ["Punished them", "Gave them gold", "Ignored them", "Trusted them"], correct: "Punished them" },
+        { q: "How did John die?", options: ["Illness", "Murder", "Battle", "Old age"], correct: "Illness" },
+        { q: "Where was John buried?", options: ["Worcester", "Canterbury", "Westminster", "York"], correct: "Worcester" },
+        { q: "Who excommunicated King John?", options: ["The Pope", "The Barons", "The King of France", "The Archbishop"], correct: "The Pope" },
+        { q: "Which pope opposed John?", options: ["Innocent III", "Urban II", "Gregory VII", "Leo X"], correct: "Innocent III" },
+        { q: "Which century did John rule in?", options: ["13th", "12th", "14th", "11th"], correct: "13th" },
+        { q: "Was John known as a fair king?", options: ["No", "Yes", "Sometimes", "Unknown"], correct: "No" },
+        { q: "What was a key demand in Magna Carta?", options: ["Fair trial", "Higher taxes", "Religious freedom", "Free land"], correct: "Fair trial" }
+      ]
+    }
+  };
+
+  let currentQuiz = null;
+  let currentQuestionIndex = 0;
+  let score = 0;
+
+  function checkPassword() {
+    const input = document.getElementById('passwordInput').value;
+    if (input === password) {
+      showMenu();
+    } else {
+      errorMsg.textContent = "Incorrect password! Try again.";
+    }
+  }
+
+  function showMenu() {
+    app.innerHTML = `
+      <h1>History Quiz</h1>
+      <button class="btn" onclick="startQuiz('edward')">🛡️ King Edward I</button>
+      <button class="btn" onclick="startQuiz('john')">📜 King John</button>
+    `;
+  }
+
+  function startQuiz(quizKey) {
+    currentQuiz = quizzes[quizKey];
+    currentQuestionIndex = 0;
+    score = 0;
+    showQuestion();
+  }
+
+  function showQuestion() {
+    const q = currentQuiz.questions[currentQuestionIndex];
+    let optionsHtml = '';
+    for (const option of q.options) {
+      optionsHtml += `<button class="option-btn" onclick="checkAnswer('${option}')">${option}</button>`;
+    }
+    app.innerHTML = `
+      <h1>${currentQuiz.title}</h1>
+      <p class="question">${currentQuestionIndex + 1}. ${q.q}</p>
+      ${optionsHtml}
+    `;
+  }
+
+  function checkAnswer(selected) {
+    const correct = currentQuiz.questions[currentQuestionIndex].correct;
+    if (selected === correct) score++;
+    currentQuestionIndex++;
+    if (currentQuestionIndex < currentQuiz.questions.length) {
+      showQuestion();
+    } else {
+      showResult();
+    }
+  }
+
+  function showResult() {
+    const percent = Math.round((score / currentQuiz.questions.length) * 100);
+    app.innerHTML = `
+      <h1>${currentQuiz.title} - Result</h1>
+      <p>You scored ${score} out of ${currentQuiz.questions.length}</p>
+      <h2>${percent}%</h2>
+      <button class="btn" onclick="showMenu()">Back to Menu</button>
+      <button class="btn" onclick="location.reload()">Logout</button>
+    `;
+  }
+</script>
+
+</body>
+</html>
