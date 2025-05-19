@@ -71,6 +71,23 @@
     max-width: 95vw;
     user-select: text;
   }
+  /* Bottom right link styling */
+  #bottomRightLink {
+    position: fixed;
+    bottom: 8px;
+    right: 8px;
+    font-size: 10px;
+    color: #555;
+    text-decoration: none;
+    font-family: Arial, sans-serif;
+    user-select: none;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+    z-index: 9999;
+  }
+  #bottomRightLink:hover {
+    opacity: 1;
+  }
 </style>
 </head>
 <body>
@@ -83,6 +100,8 @@
 </div>
 
 <div id="footer">©️HNClawtools, THIS IS A PREVIEW AND IS NOT EXPECTED TO BE PERFECT, THIS IS UNRELEASED.</div>
+
+<a id="bottomRightLink" href="https://gigimeows-channels.neocities.org/" target="_blank" rel="noopener" aria-label="External link to gigimeows channels">gigimeows-channels.neocities.org</a>
 
 <script>
   // Disable right-click context menu
@@ -135,12 +154,12 @@
         { q: "What animal is King John often linked with?", options: ["Snake", "Lion", "Dragon", "Wolf"], correct: "Snake" },
         { q: "What did John do to barons?", options: ["Punished them", "Gave them gold", "Ignored them", "Trusted them"], correct: "Punished them" },
         { q: "How did John die?", options: ["Illness", "Murder", "Battle", "Old age"], correct: "Illness" },
-        { q: "Where was John buried?", options: ["Worcester", "Canterbury", "Westminster", "York"], correct: "Worcester" },
-        { q: "Who excommunicated King John?", options: ["The Pope", "The Barons", "The King of France", "The Archbishop"], correct: "The Pope" },
-        { q: "Which pope opposed John?", options: ["Innocent III", "Urban II", "Gregory VII", "Leo X"], correct: "Innocent III" },
-        { q: "Which century did John rule in?", options: ["13th", "12th", "14th", "11th"], correct: "13th" },
-        { q: "Was John known as a fair king?", options: ["No", "Yes", "Sometimes", "Unknown"], correct: "No" },
-        { q: "What was a key demand in Magna Carta?", options: ["Fair trial", "Higher taxes", "Religious freedom", "Free land"], correct: "Fair trial" }
+        { q: "Where was John buried?", options: ["Worcester", "London", "Canterbury", "York"], correct: "Worcester" },
+        { q: "John had disputes with which Pope?", options: ["Innocent III", "Urban II", "Gregory VII", "Clement V"], correct: "Innocent III" },
+        { q: "Which castle did John own?", options: ["Winchester", "Edinburgh", "Caernarfon", "Dover"], correct: "Winchester" },
+        { q: "John’s reign is often called?", options: ["Dark Age", "Golden Age", "Renaissance", "Victorian Age"], correct: "Dark Age" },
+        { q: "John’s signature is?", options: ["A sign", "A cross", "A circle", "A star"], correct: "A cross" },
+        { q: "John was the youngest son of?", options: ["Henry II", "William I", "Edward I", "Richard I"], correct: "Henry II" }
       ]
     }
   };
@@ -152,9 +171,10 @@
   function checkPassword() {
     const input = document.getElementById('passwordInput').value;
     if (input === password) {
+      errorMsg.textContent = "";
       showMenu();
     } else {
-      errorMsg.textContent = "Incorrect password! Try again.";
+      errorMsg.textContent = "Incorrect password. Try again.";
     }
   }
 
@@ -174,37 +194,36 @@
   }
 
   function showQuestion() {
-    const q = currentQuiz.questions[currentQuestionIndex];
-    let optionsHtml = '';
-    for (const option of q.options) {
-      optionsHtml += `<button class="option-btn" onclick="checkAnswer('${option}')">${option}</button>`;
+    if (currentQuestionIndex >= currentQuiz.questions.length) {
+      showResults();
+      return;
     }
+    const questionObj = currentQuiz.questions[currentQuestionIndex];
+    let optionsHTML = "";
+    questionObj.options.forEach(option => {
+      optionsHTML += `<button class="option-btn" onclick="selectAnswer('${option}')">${option}</button>`;
+    });
     app.innerHTML = `
-      <h1>${currentQuiz.title}</h1>
-      <p class="question">${currentQuestionIndex + 1}. ${q.q}</p>
-      ${optionsHtml}
+      <h2>${currentQuiz.title} Quiz</h2>
+      <div class="question">${questionObj.q}</div>
+      <div>${optionsHTML}</div>
     `;
   }
 
-  function checkAnswer(selected) {
+  function selectAnswer(selected) {
     const correct = currentQuiz.questions[currentQuestionIndex].correct;
-    if (selected === correct) score++;
-    currentQuestionIndex++;
-    if (currentQuestionIndex < currentQuiz.questions.length) {
-      showQuestion();
-    } else {
-      showResult();
+    if (selected === correct) {
+      score++;
     }
+    currentQuestionIndex++;
+    showQuestion();
   }
 
-  function showResult() {
-    const percent = Math.round((score / currentQuiz.questions.length) * 100);
+  function showResults() {
     app.innerHTML = `
-      <h1>${currentQuiz.title} - Result</h1>
-      <p>You scored ${score} out of ${currentQuiz.questions.length}</p>
-      <h2>${percent}%</h2>
+      <h2>Quiz Finished!</h2>
+      <p>Your score: ${score} / ${currentQuiz.questions.length}</p>
       <button class="btn" onclick="showMenu()">Back to Menu</button>
-      <button class="btn" onclick="location.reload()">Logout</button>
     `;
   }
 </script>
