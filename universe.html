@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🌀 Portal Catcher: Cosmic Clicker</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background: radial-gradient(ellipse at center, #0b0c2a 0%, #000000 100%);
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    #scoreboard {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 20px;
+      z-index: 2;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 10px 20px;
+      border-radius: 10px;
+    }
+
+    .portal {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #44f1ff, #0ff, #003);
+      box-shadow: 0 0 30px 10px #00f2ff80, inset 0 0 15px #00f2ff;
+      animation: pulse 1s infinite ease-in-out;
+      cursor: pointer;
+      z-index: 1;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 30px 10px #00f2ff80, inset 0 0 15px #00f2ff;
+      }
+      50% {
+        transform: scale(1.2);
+        box-shadow: 0 0 50px 15px #00f2ffcc, inset 0 0 25px #00f2ff;
+      }
+    }
+
+    #gameover {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      font-size: 2em;
+      background: rgba(0,0,0,0.7);
+      padding: 30px;
+      border-radius: 20px;
+      display: none;
+      z-index: 3;
+    }
+
+    #gameover button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1em;
+      background-color: #00f2ff;
+      border: none;
+      border-radius: 10px;
+      color: #000;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="stars"></canvas>
+
+  <div id="scoreboard">Score: <span id="score">0</span> | Lives: <span id="lives">3</span></div>
+  <div id="gameover">
+    <div>💥 Game Over 💥<br>Your Score: <span id="final-score"></span></div>
+    <button onclick="startGame()">Play Again</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('stars');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function createStars(count) {
+      stars = [];
+      for (let i = 0; i < count; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          radius: Math.random() * 1.2,
+          alpha: Math.random()
+        });
+      }
+    }
+
+    function drawStars() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#fff';
+      stars.forEach(star => {
+        ctx.globalAlpha = star.alpha;
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+    }
+
+    function animateStars() {
+      stars.forEach(star => {
+        star.y += 0.3;
+        if (star.y > canvas.height) {
+          star.y = 0;
+          star.x = Math.random() * canvas.width;
+        }
+      });
+      drawStars();
+      requestAnimationFrame(animateStars);
+    }
+
+    createStars(150);
+    animateStars();
+
+    // Game logic
+    let score = 0;
+    let lives = 3;
+    let portalTimeout;
+    let difficulty = 1500; // ms
+
+    function spawnPortal() {
+      const portal = document.createElement('div');
+      portal.className = 'portal';
+
+      const maxX = window.innerWidth - 100;
+      const maxY = window.innerHeight - 100;
+      const x = Math.random() * maxX;
+      const y = Math.random() * maxY;
+
+      portal.style.left = x + 'px';
+      portal.style.top = y + 'px';
+
+      portal.onclick = () => {
+        score++;
+        document.getElementById('score').textContent = score;
+        portal.remove();
+        clearTimeout(portalTimeout);
+        increaseDifficulty();
+        spawnPortal();
+      };
+
+      document.body.appendChild(portal);
+
+      portalTimeout = setTimeout(() => {
+        portal.remove();
+        lives--;
+        document.getElementById('lives').textContent = lives;
+        if (lives <= 0) {
+          endGame();
+        } else {
+          spawnPortal();
+        }
+      }, difficulty);
+    }
+
+    function startGame() {
+      score = 0;
+      lives = 3;
+      difficulty = 1500;
+      document.getElementById('score').textContent = score;
+      document.getElementById('lives').textContent = lives;
+      document.getElementById('gameover').style.display = 'none';
+      spawnPortal();
+    }
+
+    function endGame() {
+      clearTimeout(portalTimeout);
+      document.getElementById('final-score').textContent = score;
+      document.getElementById('gameover').style.display = 'block';
+      // remove any existing portal
+      const existing = document.querySelector('.portal');
+      if (existing) existing.remove();
+    }
+
+    function increaseDifficulty() {
+      if (difficulty > 600) {
+        difficulty -= 50;
+      }
+    }
+
+    // Start the game
+    startGame();
+  </script>
+</body>
+</html>
