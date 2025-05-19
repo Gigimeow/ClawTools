@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>🌀 Portal Catcher: Cosmic Clicker</title>
   <style>
     body, html {
@@ -33,6 +33,17 @@
       border-radius: 10px;
     }
 
+    #coins {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 20px;
+      z-index: 2;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 10px 20px;
+      border-radius: 10px;
+    }
+
     .portal {
       position: absolute;
       width: 100px;
@@ -56,7 +67,7 @@
       }
     }
 
-    #gameover {
+    #gameover, #pauseMenu {
       position: absolute;
       top: 50%;
       left: 50%;
@@ -70,7 +81,8 @@
       z-index: 3;
     }
 
-    #gameover button {
+    #gameover button,
+    #pauseMenu button {
       margin-top: 20px;
       padding: 10px 20px;
       font-size: 1em;
@@ -80,12 +92,65 @@
       color: #000;
       cursor: pointer;
     }
+
+    #shop {
+      margin-top: 20px;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 15px;
+      border-radius: 10px;
+    }
+
+    .shop-item {
+      margin-bottom: 10px;
+      cursor: pointer;
+      background: #222;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    .shop-item:hover {
+      background: #333;
+    }
+
+    #levelDisplay {
+      position: absolute;
+      top: 50px;
+      left: 10px;
+      font-size: 20px;
+      z-index: 2;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 10px 20px;
+      border-radius: 10px;
+    }
+
+    #hint {
+      position: absolute;
+      bottom: 10px;
+      width: 100%;
+      text-align: center;
+      font-size: 14px;
+      color: #ccc;
+      z-index: 2;
+    }
   </style>
 </head>
 <body>
   <canvas id="stars"></canvas>
-
   <div id="scoreboard">Score: <span id="score">0</span> | Lives: <span id="lives">3</span></div>
+  <div id="coins">Coins: <span id="coinCount">0</span></div>
+  <div id="levelDisplay">Level: <span id="level">1</span></div>
+  <div id="hint">Press ESC to access the shop and pause the game</div>
+
+  <div id="pauseMenu">
+    <div>⏸️ Game Paused</div>
+    <button onclick="resumeGame()">▶️ Resume</button>
+    <div id="shop">
+      <h3>🛙️ Shop</h3>
+      <div class="shop-item" onclick="buyUpgrade('slower')">🧪 Slower Portals (Cost: 20)</div>
+      <div class="shop-item" onclick="buyUpgrade('extraLife')">❤️ Extra Life (Cost: 50)</div>
+    </div>
+  </div>
+
   <div id="gameover">
     <div>💥 Game Over 💥<br>Your Score: <span id="final-score"></span></div>
     <button onclick="startGame()">Play Again</button>
@@ -143,27 +208,36 @@
     createStars(150);
     animateStars();
 
-    // Game logic
     let score = 0;
+    let coins = 0;
     let lives = 3;
+    let difficulty = 1500;
     let portalTimeout;
-    let difficulty = 1500; // ms
+    let isPaused = false;
+    let level = 1;
+    let upgrades = {
+      slower: 0
+    };
+
+    let activePortal = null;
 
     function spawnPortal() {
+      if (isPaused) return;
+      if (activePortal) activePortal.remove();
+
       const portal = document.createElement('div');
       portal.className = 'portal';
-
       const maxX = window.innerWidth - 100;
       const maxY = window.innerHeight - 100;
-      const x = Math.random() * maxX;
-      const y = Math.random() * maxY;
-
-      portal.style.left = x + 'px';
-      portal.style.top = y + 'px';
+      portal.style.left = Math.random() * maxX + 'px';
+      portal.style.top = Math.random() * maxY + 'px';
 
       portal.onclick = () => {
+        if (isPaused) return;
         score++;
+        coins++;
         document.getElementById('score').textContent = score;
+        document.getElementById('coinCount').textContent = coins;
         portal.remove();
         clearTimeout(portalTimeout);
         increaseDifficulty();
@@ -171,45 +245,92 @@
       };
 
       document.body.appendChild(portal);
+      activePortal = portal;
 
+      let actualDifficulty = difficulty + (upgrades.slower * 300);
       portalTimeout = setTimeout(() => {
-        portal.remove();
-        lives--;
-        document.getElementById('lives').textContent = lives;
-        if (lives <= 0) {
-          endGame();
-        } else {
-          spawnPortal();
+        if (portal.parentElement && !isPaused) {
+          portal.remove();
+          lives--;
+          document.getElementById('lives').textContent = lives;
+          if (lives <= 0) {
+            endGame();
+          } else {
+            spawnPortal();
+          }
         }
-      }, difficulty);
+      }, actualDifficulty);
     }
 
     function startGame() {
       score = 0;
+      coins = 0;
       lives = 3;
+      level = 1;
       difficulty = 1500;
       document.getElementById('score').textContent = score;
+      document.getElementById('coinCount').textContent = coins;
       document.getElementById('lives').textContent = lives;
+      document.getElementById('level').textContent = level;
+      document.getElementById('final-score').textContent = '';
       document.getElementById('gameover').style.display = 'none';
+      document.getElementById('pauseMenu').style.display = 'none';
+      if (activePortal) activePortal.remove();
+      isPaused = false;
       spawnPortal();
     }
 
     function endGame() {
       clearTimeout(portalTimeout);
+      if (activePortal) activePortal.remove();
       document.getElementById('final-score').textContent = score;
       document.getElementById('gameover').style.display = 'block';
-      // remove any existing portal
-      const existing = document.querySelector('.portal');
-      if (existing) existing.remove();
     }
 
     function increaseDifficulty() {
-      if (difficulty > 600) {
-        difficulty -= 50;
+      if (difficulty > 600) difficulty -= 50;
+      if (score % 10 === 0 && score > 0) {
+        level++;
+        document.getElementById('level').textContent = level;
       }
     }
 
-    // Start the game
+    function buyUpgrade(type) {
+      if (type === 'slower' && coins >= 20) {
+        upgrades.slower++;
+        coins -= 20;
+      } else if (type === 'extraLife' && coins >= 50) {
+        lives++;
+        coins -= 50;
+        document.getElementById('lives').textContent = lives;
+      }
+      document.getElementById('coinCount').textContent = coins;
+    }
+
+    function togglePause() {
+      isPaused = !isPaused;
+      const menu = document.getElementById('pauseMenu');
+      if (isPaused) {
+        clearTimeout(portalTimeout);
+        if (activePortal) activePortal.style.pointerEvents = 'none';
+        menu.style.display = 'block';
+      } else {
+        if (activePortal) activePortal.style.pointerEvents = 'auto';
+        menu.style.display = 'none';
+        spawnPortal();
+      }
+    }
+
+    function resumeGame() {
+      togglePause();
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        togglePause();
+      }
+    });
+
     startGame();
   </script>
 </body>
