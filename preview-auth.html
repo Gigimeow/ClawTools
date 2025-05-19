@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ClawTools Access</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: radial-gradient(ellipse at center, #0f0f0f 0%, #000000 100%);
+      color: white;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+    }
+
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      padding: 40px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+      max-width: 90%;
+      text-align: center;
+      animation: fadeIn 1s ease forwards;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px cyan;
+    }
+
+    input[type="password"] {
+      padding: 10px 20px;
+      font-size: 1.1rem;
+      border-radius: 12px;
+      border: none;
+      outline: none;
+      margin-bottom: 20px;
+      width: 80%;
+      max-width: 300px;
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #00eaff, #007bff);
+      color: white;
+      transition: 0.3s ease;
+      box-shadow: 0 0 10px #00f0ff;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      background: linear-gradient(135deg, #00faff, #009dff);
+      box-shadow: 0 0 20px #00f0ff;
+    }
+
+    .error {
+      color: #ff5555;
+      margin-top: 10px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2rem;
+      }
+
+      .glass-panel {
+        padding: 20px;
+      }
+
+      input[type="password"] {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="glass-panel">
+    <h1>🔒 Enter Password</h1>
+    <input type="password" id="passwordInput" placeholder="Enter password..." />
+    <br>
+    <button onclick="checkPassword()">Continue</button>
+    <div class="error" id="errorText"></div>
+  </div>
+
+  <script>
+    function checkPassword() {
+      const password = document.getElementById("passwordInput").value;
+      const errorText = document.getElementById("errorText");
+      if (password === "ClawTools") {
+        window.location.href = "https://gigimeow.github.io/ClawTools/preview";
+      } else {
+        errorText.textContent = "Incorrect password. Try again.";
+      }
+    }
+
+    // Disable right-click and dev tools
+    window.addEventListener('contextmenu', e => e.preventDefault());
+    window.addEventListener('keydown', function(e) {
+      if (
+        e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J" || e.key === "C")) ||
+        (e.ctrlKey && e.key === "U")
+      ) {
+        e.preventDefault();
+        return false;
+      }
+    });
+  </script>
+</body>
+</html>
