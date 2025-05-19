@@ -125,10 +125,29 @@
         padding: 20px;
       }
     }
+
+    /* Tiny Preview Button */
+    #previewBtn {
+      position: absolute;
+      bottom: 5px;
+      right: 8px;
+      font-size: 0.6rem;
+      padding: 3px 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      text-decoration: none;
+      color: #888;
+      transition: 0.2s ease;
+      z-index: 999;
+    }
+
+    #previewBtn:hover {
+      color: #fff;
+      background: rgba(0, 255, 255, 0.2);
+    }
   </style>
 
   <script>
-    // Disable right-click and dev tools
     window.addEventListener('contextmenu', e => e.preventDefault());
     window.addEventListener('keydown', function(e) {
       if (
@@ -170,6 +189,7 @@
     <h1>ClawTools Menu</h1>
     <button onclick="showMenu('gamesMenu')">🎮 Games</button>
     <button onclick="showMenu('toolsMenu')">🛠️ Tools</button>
+    <a class="button-link" href="https://gigimeow.github.io/ClawTools/quizzes" target="_blank">📚 Quizzes</a>
     <button onclick="showMenu('creditsScreen')">⭐ Credits</button>
     <p>Visit my friend's website of fun games: <a href="https://gamesrf.neocities.org/" target="_blank">Gamesrf</a></p>
   </div>
@@ -209,5 +229,8 @@
     <p>ClawTools made by <strong>Gigimeow1019</strong></p>
     <button onclick="goBack()">⬅️ Back</button>
   </div>
+
+  <!-- Hidden Preview Button -->
+  <a id="previewBtn" href="https://gigimeow.github.io/ClawTools/Preview" target="_blank">Preview</a>
 </body>
 </html>
