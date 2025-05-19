@@ -82,7 +82,7 @@
   <p id="errorMsg" style="color: red; font-weight: bold;"></p>
 </div>
 
-<div id="footer">©️HNClawtools, THIS IS A PREVIEW AND IS NOT EXPECTED TO BE PERFECT, THIS IS UNRELEASED. Go to this for another option https://gigimeows-channels.neocities.org/</div>
+<div id="footer">©️HNClawtools, THIS IS A PREVIEW AND IS NOT EXPECTED TO BE PERFECT, THIS IS UNRELEASED.</div>
 
 <script>
   // Disable right-click context menu
