@@ -42,7 +42,7 @@
       animation: fadeIn 1s ease forwards;
     }
 
-    #mainMenu.active, #gamesMenu.active, #toolsMenu.active, #creditsScreen.active {
+    #mainMenu.active, #gamesMenu.active, #toolsMenu.active, #creditsScreen.active, #footballMenu.active {
       display: flex;
     }
 
@@ -146,6 +146,7 @@
       document.getElementById("gamesMenu").classList.remove("active");
       document.getElementById("toolsMenu").classList.remove("active");
       document.getElementById("creditsScreen").classList.remove("active");
+      document.getElementById("footballMenu").classList.remove("active");
       document.getElementById(menuId).classList.add("active");
     }
 
@@ -153,7 +154,13 @@
       document.getElementById("gamesMenu").classList.remove("active");
       document.getElementById("toolsMenu").classList.remove("active");
       document.getElementById("creditsScreen").classList.remove("active");
+      document.getElementById("footballMenu").classList.remove("active");
       document.getElementById("mainMenu").classList.add("active");
+    }
+
+    function backToGames() {
+      document.getElementById("footballMenu").classList.remove("active");
+      document.getElementById("gamesMenu").classList.add("active");
     }
   </script>
 </head>
@@ -170,11 +177,20 @@
   <!-- Games Menu -->
   <div id="gamesMenu" class="submenu glass-panel">
     <h2>🎮 Select a Game</h2>
-    <a class="button-link" href="https://gigimeow.github.io/ClawTools/footballgame" target="_blank">⚽ Football Game</a>
+    <button onclick="showMenu('footballMenu')">⚽ Football Game</button>
     <a class="button-link" href="https://gigimeow.github.io/ClawTools/shootergame" target="_blank">🔫 Shooter Game</a>
     <a class="button-link" href="https://gigimeow.github.io/ClawTools/platformergame" target="_blank">🕹️ Platformer Game</a>
+    <a class="button-link" href="https://gigimeow.github.io/ClawTools/galaxy" target="_blank">🌌 Galaxy Game</a>
     <div class="button-link disabled-button">🧪 More coming soon!</div>
     <button id="backButton" onclick="goBack()">⬅️ Back</button>
+  </div>
+
+  <!-- Football Game Submenu -->
+  <div id="footballMenu" class="submenu glass-panel">
+    <h2>⚽ Football Game Versions</h2>
+    <a class="button-link" href="https://gigimeow.github.io/ClawTools/footballgame1" target="_blank">V1</a>
+    <a class="button-link" href="https://gigimeow.github.io/ClawTools/footballgame2" target="_blank">V2</a>
+    <button id="backButton" onclick="backToGames()">⬅️ Back to Games</button>
   </div>
 
   <!-- Tools Menu -->
