@@ -1,0 +1,397 @@
+<!DOCTYPE html>                                                                                                                       
+                                                                                                                   
+<html lang="en">                                                                                                                       
+<head>
+  <meta charset="UTF-8">                                                                                                                       
+  <title>2D Football Game HN</title>                                                                                                                       
+  <style>
+    html, body {                                                                                                                       
+      margin: 0;                                                                                                                       
+      padding: 0;                                                                                                                       
+      overflow: hidden;                                                                                                                       
+      background: #0a0;                                                                                                                       
+      height: 100%;                                                                                                                       
+    }
+    canvas {
+      display: block;                                                                                                                       
+    }
+    #gameCanvas {                                                                                                                       
+      background: #0a0;                                                                                                                       
+      border: 4px solid #fff;                                                                                                                       
+      display: none;                                                                                                                       
+    }                                                                                                                        
+    #scoreBoard, #menu, #instructions, #namePrompt, #winScreen, #settingsMenu, #pauseMenu {                                                                                                                       
+      color: white;                                                                                                                       
+      text-align: center;                                                                                                                       
+      font-size: 24px;                                                                                                                       
+      margin-top: 10px;
+      position: absolute;
+      width: 100%;                                                                                                                       
+    }                                                                                                                     
+    #menu button, #difficultyMenu button, #namePrompt button, #instructions button,                                                                                                                       
+    #winScreen button, #settingsMenu button, #pauseMenu button {                                                                                                                       
+      margin: 10px;                                                                                                                       
+      padding: 10px 20px;                                                                                                                       
+      font-size: 18px;                                                                                                                       
+    }
+    #difficultyMenu {
+      display: none;
+      text-align: center;
+    }                                                                                                                     
+    #copyright {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      color: white;                                                                                                                       
+      font-size: 14px;
+    }                                                                                                                      
+    #version {
+      position: fixed;                                                                                                                       
+      bottom: 10px;                                                                                                                       
+      left: 10px;                                                                                                                       
+      color: white;                                                                                                                       
+      font-size: 14px;                                                                                                                       
+    }                                                                                                                
+    input[type="color"] {                                                                                                                                                                                                                                              
+      width: 60px;                                                                                                                       
+      height: 30px;
+      vertical-align: middle;
+    }                                                                                                                       
+    #pauseButton {
+      position: absolute;                                                                                                                       
+      top: 10px;                                                                                                                       
+      right: 10px;                                                                                                                       
+      z-index: 10;                                                                                                                       
+      font-size: 16px;                                                                                                                       
+      padding: 8px 16px;                                                                                                                       
+      display: none;                                                                                                                       
+    }                                                                                                                
+    #pauseMenu {
+      top: 100px;
+      display: none;
+    }                                                                                                                        
+  </style>                                                                                                                       
+</head>
+<body>                                                                                                        
+<canvas id="gameCanvas" width="1000" height="500"></canvas>                                                                                                                       
+<button id="pauseButton" onclick="togglePause()">Pause</button>                                                                                                                       
+<div id="pauseMenu">
+  <h2>Game Paused</h2>                                                                                                                       
+  <button onclick="resumeGame()">Resume</button>
+  <button onclick="startGame(gameMode)">Start Again</button>                                                                                                                       
+  <button onclick="stopPlaying()">Stop Playing</button>                                                                                                                       
+  <button onclick="openSettingsFromPause()">Settings</button>                                                                                                                       
+</div>
+                                                                                                 
+<div id="scoreBoard" style="display:none;">Player 1: 0 | Player 2: 0</div>                                                                                                                       
+<div id="copyright">© HN</div>                                                                                                                       
+<div id="version">V0.2.1 Beta</div>
+                                                                                                                     
+<div id="namePrompt">
+  <h2>Enter Player Names</h2>                                                                                                                       
+  <input type="text" id="p1name" placeholder="Player 1 Name"><br><br>                                                                                                                       
+  <input type="text" id="p2name" placeholder="Player 2 Name (optional)"><br><br>                                                                                                                       
+  <button onclick="submitNames()">Submit</button>                                                                                                                       
+  <button onclick="skipNames()">Skip</button>                                                                                                                       
+</div>
+
+<div id="menu" style="display:none;">                                                                                                                       
+  <h1>2D Football Game ⚽</h1>                                                                                                                       
+  <button onclick="showDifficulty()">Play</button>                                                                                                                       
+  <button onclick="showInstructions()">Instructions</button>                                                                                                                       
+  <button onclick="openSettings()">Settings</button>                                                                                                                       
+</div>
+
+<div id="difficultyMenu">                                                                                                                       
+  <h2>Select Difficulty</h2>                                                                                                                       
+  <button onclick="startGame('easy')">Easy</button>                                                                                                                       
+  <button onclick="startGame('medium')">Medium</button>                                                                                                                       
+  <button onclick="startGame('hard')">Hard</button>                                                                                                                       
+  <button onclick="startGame('twoPlayer')">Two Player</button>                                                                                                                       
+</div>
+                                                                                                           
+<div id="settingsMenu" style="display:none;">                                                                                                                       
+  <h2>Settings</h2>                                                                                                                       
+  <label>Background Color: <input type="color" id="bgColor" value="#0a0"></label><br><br>                                                                                                                       
+  <label>Player Color: <input type="color" id="playerColor" value="#0000ff"></label><br><br>                                                                                                                       
+  <button onclick="applySettings()">Apply</button>                                                                                                                       
+  <button onclick="backToMenu()">Back</button>                                                                                                                       
+</div>
+
+<div id="instructions" style="display:none;">                                                                                                                       
+  <h2>Instructions</h2>                                                                                                                       
+  <p>This game can be played without WiFi.</p>                                                                                                                       
+  <p>Use the WASD keys to move.</p>                                                                                                                       
+  <p>If playing 2-player (manually), second player uses Arrow keys.</p>         
+  <p>                        .                              </p>  
+  <p>NOTE: The AI will be fixed (also Hard mode is a bit broken)... sorry, HN</p>                                                                                                              
+  <button onclick="backToMenu()">Back</button>                                                                                                                       
+</div>
+
+<div id="winScreen" style="display:none;">                                                                                                                       
+  <h2 id="winnerText"></h2>                                                                                                                       
+  <button onclick="backToMenu()">Play Again</button>                                                                                                                       
+</div>
+
+<script>
+  const canvas = document.getElementById('gameCanvas');                                                                                                                       
+  const ctx = canvas.getContext('2d');                                                                                                                       
+  const keys = {};                                                                                                                       
+  let score1 = 0;                                                                                                                       
+  let score2 = 0;                                                                                                                       
+  let gameMode = 'easy';                                                                                                                       
+  let twoPlayer = false;                                                                                                                       
+  let gameRunning = false;                                                                                                                       
+  let gamePaused = false;                                                                                                                       
+  let player1Name = 'Player 1';                                                                                                                       
+  let player2Name = 'Player 2';                                                                                                                       
+  let bgColor = '#0a0';
+  let playerColor = 'blue';                                                                                                                       
+                                                                                                             
+  const player = { x: 50, y: 220, width: 30, height: 60, color: 'blue', speed: 5 };                                                                                                                       
+  const player2 = { x: 900, y: 220, width: 30, height: 60, color: 'green', speed: 5 };                                                                                                                       
+  const ai = { x: 900, y: 220, width: 30, height: 60, color: 'red', speed: 2 };                                                                                                                       
+  const ball = { x: 500, y: 250, radius: 15, dx: 0, dy: 0, color: 'white' };                                                                                                                       
+  const goal1 = { x: canvas.width - 40, y: 200, width: 10, height: 100, color: 'yellow' };                                                                                                                       
+  const goal2 = { x: 30, y: 200, width: 10, height: 100, color: 'yellow' };                                                                                                                       
+
+  document.addEventListener('keydown', e => keys[e.key] = true);                                                                                                                       
+  document.addEventListener('keyup', e => keys[e.key] = false);                                                                                                                       
+
+  function submitNames() {
+    player1Name = document.getElementById('p1name').value || 'Player 1';                                                                                                                       
+    player2Name = document.getElementById('p2name').value || 'Player 2';
+    document.getElementById('namePrompt').style.display = 'none';                                                                                                                                                                                                                                              
+    document.getElementById('menu').style.display = 'block';                                                                                                                       
+  }
+
+  function skipNames() {                                                                                                                       
+    document.getElementById('namePrompt').style.display = 'none';                                                                                                                       
+    document.getElementById('menu').style.display = 'block';                                                                                                                       
+  }
+
+  function openSettings() {
+    document.getElementById('menu').style.display = 'none';                                                                                                                       
+    document.getElementById('settingsMenu').style.display = 'block';                                                                                                                       
+  }
+                                                                                                                     
+  function openSettingsFromPause() {
+    document.getElementById('pauseMenu').style.display = 'none';                                                                                                                       
+    document.getElementById('settingsMenu').style.display = 'block';                                                                                                                       
+  }
+
+  function applySettings() {
+    bgColor = document.getElementById('bgColor').value;
+    playerColor = document.getElementById('playerColor').value;
+    player.color = playerColor;
+    document.body.style.background = bgColor;
+    canvas.style.background = bgColor;
+    backToMenu();
+  }
+
+  function movePlayer() {
+    if (keys['w']) player.y -= player.speed;                                                                                                                       
+    if (keys['s']) player.y += player.speed;                                                                                                                       
+    if (keys['a']) player.x -= player.speed;                                                                                                                       
+    if (keys['d']) player.x += player.speed;                                                                                                                       
+
+    if (twoPlayer) {
+      if (keys['ArrowUp']) player2.y -= player2.speed;                                                                                                                       
+      if (keys['ArrowDown']) player2.y += player2.speed;                                                                                                                       
+      if (keys['ArrowLeft']) player2.x -= player2.speed;                                                                                                                       
+      if (keys['ArrowRight']) player2.x += player2.speed;                                                                                                                       
+    }
+
+    player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));                                                                                                                       
+    player.y = Math.max(0, Math.min(canvas.height - player.height, player.y));                                                                                                                       
+    if (twoPlayer) {
+      player2.x = Math.max(0, Math.min(canvas.width - player2.width, player2.x));                                                                                                                       
+      player2.y = Math.max(0, Math.min(canvas.height - player2.height, player2.y));                                                                                                                       
+    }
+  }
+
+  function moveAI() {                                                                                                                       
+    if (twoPlayer) return;
+    const defenseMode = ball.x > canvas.width / 2;                                                                                                                       
+    const targetX = defenseMode ? ball.x - 20 : goal2.x + goal2.width;
+    const targetY = ball.y;                                                                                                                                                                                                                                              
+                                                                                                                      
+    if (ai.x > targetX) ai.x -= ai.speed;                                                                                                                       
+    if (ai.x < targetX) ai.x += ai.speed;                                                                                                                       
+    if (ai.y > targetY) ai.y -= ai.speed;                                                                                                                       
+    if (ai.y < targetY) ai.y += ai.speed;                                                                                                                       
+
+    // Avoid corners
+    if ((ball.x < 100 || ball.x > canvas.width - 100) && (ball.y < 50 || ball.y > canvas.height - 50)) {
+      ball.dx = (canvas.width / 2 - ball.x) * 0.05;
+      ball.dy = (canvas.height / 2 - ball.y) * 0.05;
+    }                                                                                                                       
+  }
+
+  function moveBall() {
+    ball.x += ball.dx;
+    ball.y += ball.dy;                                                                                                                       
+    ball.dx *= 0.98;
+    ball.dy *= 0.98;
+
+    if (ball.x - ball.radius < 0) {
+      ball.x = ball.radius;
+      ball.dx *= -1;
+    }
+    if (ball.x + ball.radius > canvas.width) {
+      ball.x = canvas.width - ball.radius;                                                                                                                       
+      ball.dx *= -1;
+    }
+    if (ball.y - ball.radius < 0) {
+      ball.y = ball.radius;                                                                                                                       
+      ball.dy *= -1;
+    }
+    if (ball.y + ball.radius > canvas.height) {                                                                                                                       
+      ball.y = canvas.height - ball.radius;                                                                                                                       
+      ball.dy *= -1;
+    }
+  }
+                                                                                                                                       
+  function detectCollisionWith(p) {
+    const distX = (p.x + p.width / 2) - ball.x;                                                                                                                       
+    const distY = (p.y + p.height / 2) - ball.y;                                                                                                                       
+    const distance = Math.sqrt(distX * distX + distY * distY);
+    if (distance < ball.radius + Math.max(p.width, p.height) / 2) {                                                                                                                       
+      const angle = Math.atan2(distY, distX);
+      ball.dx = -Math.cos(angle) * 5;
+      ball.dy = -Math.sin(angle) * 5;
+    }
+  }
+
+  function checkGoal() {
+    if (ball.x + ball.radius > goal1.x && ball.y > goal1.y && ball.y < goal1.y + goal1.height) {
+      score1++;
+      resetBall();
+    }
+    if (ball.x - ball.radius < goal2.x + goal2.width && ball.y > goal2.y && ball.y < goal2.y + goal2.height) {
+      score2++;
+      resetBall();
+    }
+    document.getElementById('scoreBoard').innerText = player1Name + ': ' + score1 + ' | ' + player2Name + ': ' + score2;
+
+    if (score1 >= 10 || score2 >= 10) {
+      gameRunning = false;
+      document.getElementById('winScreen').style.display = 'block';
+      document.getElementById('pauseButton').style.display = 'none';
+      document.getElementById('winnerText').innerText = (score1 > score2 ? player1Name : player2Name) + ' Won!';
+    }
+  }
+
+  function resetBall() {
+    ball.x = canvas.width / 2;
+    ball.y = canvas.height / 2;
+    ball.dx = 0;
+    ball.dy = 0;
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                                                                                                                          
+    ctx.fillStyle = goal1.color;
+    ctx.fillRect(goal1.x, goal1.y, goal1.width, goal1.height);
+    ctx.fillStyle = goal2.color;
+    ctx.fillRect(goal2.x, goal2.y, goal2.width, goal2.height);
+
+    ctx.fillStyle = player.color;
+    ctx.fillRect(player.x, player.y, player.width, player.height);
+
+    if (twoPlayer) {
+      ctx.fillStyle = player2.color;
+      ctx.fillRect(player2.x, player2.y, player2.width, player2.height);
+    } else {
+      ctx.fillStyle = ai.color;
+      ctx.fillRect(ai.x, ai.y, ai.width, ai.height);
+    }
+
+    ctx.beginPath();
+    ctx.fillStyle = ball.color;
+    ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function gameLoop() {
+    if (!gameRunning || gamePaused) return;
+    movePlayer();
+    moveAI();
+    moveBall();
+    detectCollisionWith(player);
+    if (twoPlayer) detectCollisionWith(player2);
+    else detectCollisionWith(ai);
+    checkGoal();
+    draw();
+    requestAnimationFrame(gameLoop);
+  }
+                                                                                                                       
+  function togglePause() {
+    gamePaused = !gamePaused;
+    document.getElementById('pauseMenu').style.display = gamePaused ? 'block' : 'none';
+    if (!gamePaused) gameLoop();
+  }
+
+  function resumeGame() {
+    togglePause();
+  }
+                                                                                                                       
+  function stopPlaying() {
+    gameRunning = false;
+    gamePaused = false;
+    document.getElementById('pauseMenu').style.display = 'none';
+    backToMenu();
+  }
+
+  function showInstructions() {
+    document.getElementById('menu').style.display = 'none';
+    document.getElementById('instructions').style.display = 'block';
+  }
+
+  function backToMenu() {
+    document.getElementById('menu').style.display = 'block';
+    document.getElementById('instructions').style.display = 'none';
+    document.getElementById('difficultyMenu').style.display = 'none';
+    document.getElementById('gameCanvas').style.display = 'none';
+    document.getElementById('scoreBoard').style.display = 'none';
+    document.getElementById('winScreen').style.display = 'none';
+    document.getElementById('settingsMenu').style.display = 'none';
+    document.getElementById('pauseButton').style.display = 'none';
+    document.getElementById('pauseMenu').style.display = 'none';
+  }
+                                                                                                                       
+  function showDifficulty() {
+    document.getElementById('menu').style.display = 'none';
+    document.getElementById('difficultyMenu').style.display = 'block';
+  }
+
+  function startGame(mode) {
+    gameMode = mode;
+    twoPlayer = (mode === 'twoPlayer');
+    document.getElementById('menu').style.display = 'none';
+    document.getElementById('difficultyMenu').style.display = 'none';
+    document.getElementById('gameCanvas').style.display = 'block';
+    document.getElementById('scoreBoard').style.display = 'block';
+    document.getElementById('pauseButton').style.display = 'block';
+    document.getElementById('winScreen').style.display = 'none';
+    document.getElementById('pauseMenu').style.display = 'none';
+    score1 = 0;
+    score2 = 0;
+    gameRunning = true;
+    gamePaused = false;
+                                                                                                                       
+    if (mode === 'easy') ai.speed = 1;
+    if (mode === 'medium') ai.speed = 2;
+    if (mode === 'hard') ai.speed = 4;
+
+    resetBall();
+    gameLoop();
+  }
+</script>
+</body>
+</html>
+
+                                                                                                                       
+.
+                                                                                                                       
