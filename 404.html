@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>404 Not Found</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: radial-gradient(ellipse at center, #0f0f0f 0%, #000000 100%);
+      color: white;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+    }
+
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      padding: 40px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+      text-align: center;
+      animation: fadeIn 1s ease forwards;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px red;
+    }
+
+    p {
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+      color: #ccc;
+    }
+
+    .button-link {
+      padding: 12px 24px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #00eaff, #007bff);
+      color: white;
+      transition: 0.3s ease;
+      box-shadow: 0 0 10px #00f0ff;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .button-link:hover {
+      transform: scale(1.05);
+      background: linear-gradient(135deg, #00faff, #009dff);
+      box-shadow: 0 0 20px #00f0ff;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2.2rem;
+      }
+
+      .glass-panel {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="glass-panel">
+    <h1>🚫 404 - Page Not Found</h1>
+    <p>Sorry, the page you are looking for doesn't exist.</p>
+    <a class="button-link" href="https://gigimeow.github.io/ClawTools/">⬅️ Back to Menu</a>
+  </div>
+</body>
+</html>
