@@ -2,82 +2,173 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Coming Soon!</title>
+  <title>Geography Quiz</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      background: #f0f0f0;
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: radial-gradient(ellipse at center, #0f0f0f 0%, #000000 100%);
-      color: white;
-      height: 100vh;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+      padding: 20px;
     }
 
-    .glass-panel {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 20px;
-      padding: 40px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
-      text-align: center;
-      animation: fadeIn 1s ease forwards;
+    .menu, .quiz, .result {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+      transition: opacity 0.6s ease-in-out;
     }
 
     h1 {
-      font-size: 3rem;
-      margin-bottom: 30px;
-      text-shadow: 0 0 10px cyan;
+      margin-bottom: 20px;
     }
 
-    .button-link {
+    button {
       padding: 12px 24px;
-      font-size: 1.1rem;
+      margin: 10px;
+      font-size: 16px;
       cursor: pointer;
-      border: none;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #00eaff, #007bff);
+      background-color: #28a745;
       color: white;
-      transition: 0.3s ease;
-      box-shadow: 0 0 10px #00f0ff;
-      text-decoration: none;
-      display: inline-block;
+      border: none;
+      border-radius: 8px;
+      transition: background 0.3s ease;
     }
 
-    .button-link:hover {
-      transform: scale(1.05);
-      background: linear-gradient(135deg, #00faff, #009dff);
-      box-shadow: 0 0 20px #00f0ff;
+    button:hover {
+      background-color: #1e7e34;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    .fade {
+      opacity: 0;
+      pointer-events: none;
     }
 
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 2.2rem;
-      }
+    .question {
+      margin: 20px 0;
+    }
 
-      .glass-panel {
-        padding: 20px;
-      }
+    .options button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+    }
+
+    .score {
+      font-size: 24px;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <div class="glass-panel">
-    <h1>🚧 Coming Soon!</h1>
-    <a class="button-link" href="https://gigimeow.github.io/ClawTools/">⬅️ Back to Menu</a>
-  </div>
+
+<div class="menu" id="mainMenu">
+  <h1>🌍 Geography Quiz</h1>
+  <button onclick="startQuiz()">Start Quiz</button>
+</div>
+
+<div class="quiz fade" id="quizContainer">
+  <h2 id="questionText"></h2>
+  <div class="options" id="optionsContainer"></div>
+  <button onclick="nextQuestion()">Next</button>
+</div>
+
+<div class="result fade" id="resultScreen">
+  <h1>Quiz Complete!</h1>
+  <div class="score" id="finalScore"></div>
+  <button onclick="goToMenu()">Back to Menu</button>
+</div>
+
+<script>
+  const questions = [
+    { q: "What is the capital of Australia?", a: "Canberra", options: ["Sydney", "Melbourne", "Canberra", "Perth"] },
+    { q: "Which river is the longest in the world?", a: "Nile", options: ["Amazon", "Yangtze", "Nile", "Mississippi"] },
+    { q: "Mount Everest is in which mountain range?", a: "Himalayas", options: ["Andes", "Alps", "Himalayas", "Rockies"] },
+    { q: "Which continent is the Sahara Desert located on?", a: "Africa", options: ["Asia", "Australia", "Africa", "South America"] },
+    { q: "The equator passes through how many continents?", a: "3", options: ["1", "2", "3", "4"] },
+    { q: "Which ocean is the largest?", a: "Pacific", options: ["Atlantic", "Pacific", "Indian", "Arctic"] },
+    { q: "What country has the most people?", a: "China", options: ["India", "USA", "China", "Indonesia"] },
+    { q: "Which European country has the most islands?", a: "Sweden", options: ["Norway", "Greece", "Sweden", "Italy"] },
+    { q: "Which is the smallest country in the world?", a: "Vatican City", options: ["Monaco", "Nauru", "Vatican City", "San Marino"] },
+    { q: "Which country is both in Europe and Asia?", a: "Turkey", options: ["Russia", "Turkey", "Kazakhstan", "Egypt"] },
+    { q: "Which city is known as the 'Big Apple'?", a: "New York", options: ["Los Angeles", "New York", "Chicago", "San Francisco"] },
+    { q: "Which country has the longest coastline?", a: "Canada", options: ["Australia", "Russia", "USA", "Canada"] },
+    { q: "Where is the Amazon rainforest?", a: "South America", options: ["Africa", "Asia", "South America", "North America"] },
+    { q: "Which sea is the saltiest?", a: "Dead Sea", options: ["Red Sea", "Caspian Sea", "Dead Sea", "Black Sea"] },
+    { q: "Which city is the capital of Canada?", a: "Ottawa", options: ["Toronto", "Ottawa", "Vancouver", "Montreal"] },
+    { q: "The River Thames flows through which city?", a: "London", options: ["Manchester", "Oxford", "London", "Cambridge"] },
+    { q: "What is the capital of Japan?", a: "Tokyo", options: ["Kyoto", "Tokyo", "Osaka", "Hiroshima"] },
+    { q: "Which African country has pyramids?", a: "Egypt", options: ["Egypt", "Sudan", "Ethiopia", "Libya"] },
+    { q: "What is the hottest continent?", a: "Africa", options: ["Africa", "Asia", "Australia", "South America"] },
+    { q: "What is the capital of Brazil?", a: "Brasília", options: ["São Paulo", "Rio de Janeiro", "Brasília", "Recife"] }
+  ];
+
+  let currentQuestionIndex = 0;
+  let score = 0;
+
+  function startQuiz() {
+    currentQuestionIndex = 0;
+    score = 0;
+    document.getElementById("mainMenu").classList.add("fade");
+    setTimeout(() => {
+      document.getElementById("mainMenu").style.display = "none";
+      document.getElementById("quizContainer").classList.remove("fade");
+      showQuestion();
+    }, 500);
+  }
+
+  function showQuestion() {
+    const q = questions[currentQuestionIndex];
+    document.getElementById("questionText").innerText = `Q${currentQuestionIndex + 1}: ${q.q}`;
+    const optionsContainer = document.getElementById("optionsContainer");
+    optionsContainer.innerHTML = "";
+    q.options.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.innerText = opt;
+      btn.onclick = () => {
+        if (opt === q.a) score++;
+        nextQuestion();
+      };
+      optionsContainer.appendChild(btn);
+    });
+  }
+
+  function nextQuestion() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < questions.length) {
+      showQuestion();
+    } else {
+      showResult();
+    }
+  }
+
+  function showResult() {
+    document.getElementById("quizContainer").classList.add("fade");
+    setTimeout(() => {
+      document.getElementById("quizContainer").style.display = "none";
+      const percent = Math.round((score / questions.length) * 100);
+      document.getElementById("finalScore").innerText = `You scored ${score}/${questions.length} (${percent}%)`;
+      document.getElementById("resultScreen").classList.remove("fade");
+    }, 500);
+  }
+
+  function goToMenu() {
+    document.getElementById("resultScreen").classList.add("fade");
+    setTimeout(() => {
+      document.getElementById("resultScreen").style.display = "none";
+      document.getElementById("mainMenu").style.display = "block";
+      document.getElementById("mainMenu").classList.remove("fade");
+    }, 500);
+  }
+</script>
+
+<script>
+  // Disable right-click context menu
+  document.addEventListener('contextmenu', event => event.preventDefault());
+</script>
+
 </body>
 </html>
