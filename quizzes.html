@@ -27,8 +27,8 @@
       text-shadow: 0 0 10px cyan;
     }
 
-    #quizMenu, #historySubmenu {
-      display: none;
+    #quizMenu {
+      display: flex;
       flex-direction: column;
       gap: 20px;
       text-align: center;
@@ -42,10 +42,6 @@
       animation: fadeIn 1s ease forwards;
     }
 
-    .active {
-      display: flex !important;
-    }
-
     .glass-panel {
       background: rgba(255, 255, 255, 0.05);
       border-radius: 20px;
@@ -57,7 +53,7 @@
       max-width: 90%;
     }
 
-    button, .button-link {
+    .button-link {
       padding: 12px 24px;
       font-size: 1.1rem;
       cursor: pointer;
@@ -71,20 +67,10 @@
       display: inline-block;
     }
 
-    button:hover, .button-link:hover {
+    .button-link:hover {
       transform: scale(1.05);
       background: linear-gradient(135deg, #00faff, #009dff);
       box-shadow: 0 0 20px #00f0ff;
-    }
-
-    #backButton {
-      margin-top: 20px;
-      background: linear-gradient(135deg, #555, #222);
-      box-shadow: 0 0 10px #444;
-    }
-
-    #backButton:hover {
-      background: linear-gradient(135deg, #777, #333);
     }
 
     @keyframes fadeIn {
@@ -96,26 +82,14 @@
 <body>
 
   <!-- Main Quiz Menu -->
-  <div id="quizMenu" class="glass-panel active">
+  <div id="quizMenu" class="glass-panel">
     <h1>🎓 Quiz Menu</h1>
-    <button onclick="showMenu('historySubmenu')">📜 History</button>
+    <a class="button-link" href="https://gigimeow.github.io/ClawTools/History">📜 History</a>
     <a class="button-link" href="https://gigimeow.github.io/ClawTools/Geography">🌍 Geography</a>
     <a class="button-link" href="https://gigimeow.github.io/ClawTools/Science">🧪 Science</a>
     <a class="button-link" href="https://gigimeow.github.io/ClawTools/Maths">➕ Maths</a>
     <a class="button-link" href="https://gigimeow.github.io/ClawTools/TPR">🙏 TPR</a>
-    <a class="button-link" href="https://gigimeow.github.io/ClawTools/History">📜 History</a>
   </div>
 
-  <script>
-    function showMenu(menuId) {
-      document.getElementById("quizMenu").classList.remove("active");
-      document.getElementById("historySubmenu").classList.remove("active");
-      document.getElementById(menuId).classList.add("active");
-    }
-
-    function goBackToMainQuiz() {
-      document.getElementById("quizMenu").classList.add("active");
-    }
-  </script>
 </body>
 </html>
