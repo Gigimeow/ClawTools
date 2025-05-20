@@ -2,82 +2,201 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Coming Soon!</title>
+  <title>History Quiz</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      background: #f0f0f0;
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: radial-gradient(ellipse at center, #0f0f0f 0%, #000000 100%);
-      color: white;
-      height: 100vh;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+      padding: 20px;
     }
 
-    .glass-panel {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 20px;
-      padding: 40px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
-      text-align: center;
-      animation: fadeIn 1s ease forwards;
+    .menu, .quiz, .result {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+      transition: opacity 0.6s ease-in-out;
     }
 
     h1 {
-      font-size: 3rem;
-      margin-bottom: 30px;
-      text-shadow: 0 0 10px cyan;
+      margin-bottom: 20px;
     }
 
-    .button-link {
+    button {
       padding: 12px 24px;
-      font-size: 1.1rem;
+      margin: 10px;
+      font-size: 16px;
       cursor: pointer;
-      border: none;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #00eaff, #007bff);
+      background-color: #007bff;
       color: white;
-      transition: 0.3s ease;
-      box-shadow: 0 0 10px #00f0ff;
-      text-decoration: none;
-      display: inline-block;
+      border: none;
+      border-radius: 8px;
+      transition: background 0.3s ease;
     }
 
-    .button-link:hover {
-      transform: scale(1.05);
-      background: linear-gradient(135deg, #00faff, #009dff);
-      box-shadow: 0 0 20px #00f0ff;
+    button:hover {
+      background-color: #0056b3;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    .fade {
+      opacity: 0;
+      pointer-events: none;
     }
 
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 2.2rem;
-      }
+    .question {
+      margin: 20px 0;
+    }
 
-      .glass-panel {
-        padding: 20px;
-      }
+    .options button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+    }
+
+    .score {
+      font-size: 24px;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <div class="glass-panel">
-    <h1>🚧 Coming Soon!</h1>
-    <a class="button-link" href="https://gigimeow.github.io/ClawTools/">⬅️ Back to Menu</a>
-  </div>
+
+<div class="menu" id="mainMenu">
+  <h1>🧠 History Quiz</h1>
+  <button onclick="startQuiz('edward1')">Edward I</button>
+  <button onclick="startQuiz('john1')">King John I</button>
+</div>
+
+<div class="quiz fade" id="quizContainer">
+  <h2 id="questionText"></h2>
+  <div class="options" id="optionsContainer"></div>
+  <button onclick="nextQuestion()">Next</button>
+</div>
+
+<div class="result fade" id="resultScreen">
+  <h1>Quiz Complete!</h1>
+  <div class="score" id="finalScore"></div>
+  <button onclick="goToMenu()">Back to Menu</button>
+</div>
+
+<script>
+  const questions = {
+    edward1: [
+      { q: "When did Edward I become king?", a: "1272", options: ["1272", "1290", "1307", "1250"] },
+      { q: "When did Edward I die?", a: "1307", options: ["1272", "1300", "1307", "1315"] },
+      { q: "Edward I's nickname?", a: "Longshanks", options: ["Shortfoot", "Hammerhead", "Longshanks", "Stoneheart"] },
+      { q: "Edward I's father?", a: "Henry III", options: ["John I", "Henry III", "Richard I", "William"] },
+      { q: "Edward I tried to conquer?", a: "Scotland", options: ["Ireland", "France", "Scotland", "Germany"] },
+      { q: "Who did Edward I fight in Scotland?", a: "William Wallace", options: ["Bruce Lee", "William Wallace", "Robert Frost", "John Ball"] },
+      { q: "Statute of Westminster year?", a: "1275", options: ["1300", "1275", "1285", "1290"] },
+      { q: "Wales conquest completed in?", a: "1283", options: ["1272", "1300", "1283", "1299"] },
+      { q: "Which castle did he build?", a: "Caernarfon", options: ["Windsor", "Caernarfon", "Buckingham", "Oxford"] },
+      { q: "Edward strengthened what?", a: "Parliament", options: ["Monarchy", "Parliament", "Navy", "Church"] },
+      { q: "Who was executed after Falkirk?", a: "William Wallace", options: ["Robert Bruce", "William Wallace", "Simon de Montfort", "Henry V"] },
+      { q: "Edward I's wars mostly involved?", a: "Scotland and Wales", options: ["France", "Ireland", "Scotland and Wales", "Spain"] },
+      { q: "Nickname for being tall?", a: "Longshanks", options: ["Big Ed", "Longshanks", "Tower King", "Edward Tall"] },
+      { q: "Was Edward I a Plantagenet?", a: "Yes", options: ["Yes", "No", "Unsure", "Maybe"] },
+      { q: "Edward's mother?", a: "Eleanor of Provence", options: ["Matilda", "Eleanor of Aquitaine", "Eleanor of Provence", "Elizabeth"] },
+      { q: "He summoned what in 1295?", a: "Model Parliament", options: ["Royal Council", "Privy Council", "Model Parliament", "Knight's Court"] },
+      { q: "Edward’s burial place?", a: "Westminster Abbey", options: ["Canterbury", "Windsor", "Westminster Abbey", "York"] },
+      { q: "Who succeeded Edward I?", a: "Edward II", options: ["Edward II", "Richard I", "Henry V", "John II"] },
+      { q: "Edward fought in what Crusade?", a: "Ninth Crusade", options: ["First", "Third", "Ninth", "Sixth"] },
+      { q: "Famous act of 1290?", a: "Expulsion of Jews", options: ["Magna Carta", "Expulsion of Jews", "Treaty of York", "Statute of Rhuddlan"] },
+    ],
+    john1: [
+      { q: "When did King John become king?", a: "1199", options: ["1199", "1215", "1200", "1189"] },
+      { q: "When did King John die?", a: "1216", options: ["1215", "1216", "1217", "1220"] },
+      { q: "John's most famous charter?", a: "Magna Carta", options: ["Great Reform", "King's Decree", "Magna Carta", "Royal Laws"] },
+      { q: "Lost lands to which king?", a: "Philip II of France", options: ["Henry V", "Richard I", "Philip II of France", "Louis IX"] },
+      { q: "John’s nickname?", a: "Lackland", options: ["Landless", "Softsword", "Lackland", "No King"] },
+      { q: "Signed Magna Carta in?", a: "1215", options: ["1215", "1200", "1220", "1199"] },
+      { q: "John was the brother of?", a: "Richard the Lionheart", options: ["Henry III", "Edward I", "William I", "Richard the Lionheart"] },
+      { q: "Magna Carta signed at?", a: "Runnymede", options: ["Tower of London", "Canterbury", "Runnymede", "York"] },
+      { q: "John had conflict with which church leader?", a: "Pope Innocent III", options: ["Pope John I", "Pope Innocent III", "Pope Leo", "Pope Urban"] },
+      { q: "Was King John popular?", a: "No", options: ["Yes", "No", "Maybe", "Only in Wales"] },
+      { q: "How did John die?", a: "Illness", options: ["Murdered", "Battle", "Poison", "Illness"] },
+      { q: "John ruled during which century?", a: "13th", options: ["12th", "13th", "14th", "15th"] },
+      { q: "What battle did he lose?", a: "Battle of Bouvines", options: ["Battle of Agincourt", "Battle of Hastings", "Battle of Bouvines", "Battle of the Thames"] },
+      { q: "Who succeeded John?", a: "Henry III", options: ["Edward I", "Henry III", "Richard II", "William IV"] },
+      { q: "John ruled over?", a: "England", options: ["France", "Ireland", "Scotland", "England"] },
+      { q: "Magna Carta limited?", a: "The King’s Power", options: ["The Church", "The King’s Power", "The Nobles", "The Pope"] },
+      { q: "What civil war happened after?", a: "First Barons' War", options: ["War of Roses", "Civil War", "First Barons' War", "Hundred Years' War"] },
+      { q: "Was John a good military leader?", a: "No", options: ["Yes", "No", "Average", "Sometimes"] },
+      { q: "How many times was Magna Carta reissued?", a: "Multiple", options: ["Once", "Twice", "Never", "Multiple"] },
+      { q: "John was part of which dynasty?", a: "Plantagenet", options: ["Tudor", "Norman", "Plantagenet", "Lancaster"] },
+    ]
+  };
+
+  let currentQuiz = "";
+  let currentQuestionIndex = 0;
+  let score = 0;
+
+  function startQuiz(quizKey) {
+    currentQuiz = quizKey;
+    currentQuestionIndex = 0;
+    score = 0;
+    document.getElementById("mainMenu").classList.add("fade");
+    setTimeout(() => {
+      document.getElementById("mainMenu").style.display = "none";
+      document.getElementById("quizContainer").classList.remove("fade");
+      showQuestion();
+    }, 500);
+  }
+
+  function showQuestion() {
+    const q = questions[currentQuiz][currentQuestionIndex];
+    document.getElementById("questionText").innerText = `Q${currentQuestionIndex + 1}: ${q.q}`;
+    const optionsContainer = document.getElementById("optionsContainer");
+    optionsContainer.innerHTML = "";
+    q.options.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.innerText = opt;
+      btn.onclick = () => {
+        if (opt === q.a) score++;
+        nextQuestion();
+      };
+      optionsContainer.appendChild(btn);
+    });
+  }
+
+  function nextQuestion() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < 20) {
+      showQuestion();
+    } else {
+      showResult();
+    }
+  }
+
+  function showResult() {
+    document.getElementById("quizContainer").classList.add("fade");
+    setTimeout(() => {
+      document.getElementById("quizContainer").style.display = "none";
+      const percent = Math.round((score / 20) * 100);
+      document.getElementById("finalScore").innerText = `You scored ${score}/20 (${percent}%)`;
+      document.getElementById("resultScreen").classList.remove("fade");
+    }, 500);
+  }
+
+  function goToMenu() {
+    document.getElementById("resultScreen").classList.add("fade");
+    setTimeout(() => {
+      document.getElementById("resultScreen").style.display = "none";
+      document.getElementById("mainMenu").style.display = "block";
+      document.getElementById("mainMenu").classList.remove("fade");
+    }, 500);
+  }
+</script>
+
+<script>
+  // Disable right-click context menu
+  document.addEventListener('contextmenu', event => event.preventDefault());
+</script>
+
+
 </body>
 </html>
