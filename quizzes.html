@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Coming Soon!</title>
+  <title>ClawTools Quiz Menu</title>
   <style>
     * {
       box-sizing: border-box;
@@ -21,6 +21,31 @@
       background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
     }
 
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px cyan;
+    }
+
+    #quizMenu, #historySubmenu {
+      display: none;
+      flex-direction: column;
+      gap: 20px;
+      text-align: center;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      width: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      animation: fadeIn 1s ease forwards;
+    }
+
+    .active {
+      display: flex !important;
+    }
+
     .glass-panel {
       background: rgba(255, 255, 255, 0.05);
       border-radius: 20px;
@@ -28,17 +53,11 @@
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.1);
       box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
-      text-align: center;
-      animation: fadeIn 1s ease forwards;
+      transition: transform 0.3s ease;
+      max-width: 90%;
     }
 
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 30px;
-      text-shadow: 0 0 10px cyan;
-    }
-
-    .button-link {
+    button, .button-link {
       padding: 12px 24px;
       font-size: 1.1rem;
       cursor: pointer;
@@ -52,32 +71,59 @@
       display: inline-block;
     }
 
-    .button-link:hover {
+    button:hover, .button-link:hover {
       transform: scale(1.05);
       background: linear-gradient(135deg, #00faff, #009dff);
       box-shadow: 0 0 20px #00f0ff;
+    }
+
+    #backButton {
+      margin-top: 20px;
+      background: linear-gradient(135deg, #555, #222);
+      box-shadow: 0 0 10px #444;
+    }
+
+    #backButton:hover {
+      background: linear-gradient(135deg, #777, #333);
     }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 2.2rem;
-      }
-
-      .glass-panel {
-        padding: 20px;
-      }
-    }
   </style>
 </head>
 <body>
-  <div class="glass-panel">
-    <h1>🚧 Coming Soon!</h1>
-    <a class="button-link" href="https://gigimeow.github.io/ClawTools/">⬅️ Back to Menu</a>
+
+  <!-- Main Quiz Menu -->
+  <div id="quizMenu" class="glass-panel active">
+    <h1>🎓 Quiz Menu</h1>
+    <button onclick="showMenu('historySubmenu')">📜 History</button>
+    <a class="button-link" href="https://gigimeow.github.io/ClawTools/Geography">🌍 Geography</a>
+    <a class="button-link" href="https://gigimeow.github.io/ClawTools/Science">🧪 Science</a>
+    <a class="button-link" href="https://gigimeow.github.io/ClawTools/Maths">➕ Maths</a>
+    <a class="button-link" href="https://gigimeow.github.io/ClawTools/TPR">🙏 TPR</a>
   </div>
+
+  <!-- History Submenu -->
+  <div id="historySubmenu" class="glass-panel">
+    <h1>📜 History Topics</h1>
+    <a class="button-link" href="https://gigimeow.github.io/ClawTools/EdwardI">👑 King Edward I</a>
+    <a class="button-link" href="https://gigimeow.github.io/ClawTools/KingJohnI">👑 King John I</a>
+    <button id="backButton" onclick="goBackToMainQuiz()">← Back</button>
+  </div>
+
+  <script>
+    function showMenu(menuId) {
+      document.getElementById("quizMenu").classList.remove("active");
+      document.getElementById("historySubmenu").classList.remove("active");
+      document.getElementById(menuId).classList.add("active");
+    }
+
+    function goBackToMainQuiz() {
+      document.getElementById("quizMenu").classList.add("active");
+      document.getElementById("historySubmenu").classList.remove("active");
+    }
+  </script>
 </body>
 </html>
