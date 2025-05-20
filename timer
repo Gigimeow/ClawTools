@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ClawTools Timer</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle, #0f0f0f, #000);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      height: 100vh;
+      color: #00f0ff;
+      overflow: hidden;
+      background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+    }
+
+    .timer {
+      font-size: 5rem;
+      text-shadow: 0 0 20px #00f0ff;
+      margin: 20px;
+      transition: transform 0.2s ease;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #00eaff, #007bff);
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 0 15px #00eaff;
+      transition: all 0.2s ease;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      background: linear-gradient(135deg, #00faff, #009dff);
+      box-shadow: 0 0 25px #00faff;
+    }
+
+    .speed-cube-mode .buttons {
+      display: none;
+    }
+
+    .speed-cube-mode .timer {
+      font-size: 10rem;
+    }
+
+    .mode-indicator {
+      margin-top: 10px;
+      font-size: 1rem;
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body>
+
+  <h1 class="timer" id="display">00:00.00</h1>
+
+  <div class="buttons">
+    <button onclick="start()">▶ Start</button>
+    <button onclick="stop()">⏸ Stop</button>
+    <button onclick="reset()">🔁 Reset</button>
+    <button onclick="toggleSpeedCubeMode()">⚡ Speed-Cube Mode</button>
+  </div>
+
+  <p class="mode-indicator" id="modeStatus">Normal Mode</p>
+
+  <script>
+    let startTime, interval;
+    let running = false;
+    let speedCubeMode = false;
+
+    function updateDisplay() {
+      const elapsed = Date.now() - startTime;
+      const minutes = String(Math.floor(elapsed / 60000)).padStart(2, '0');
+      const seconds = String(Math.floor((elapsed % 60000) / 1000)).padStart(2, '0');
+      const ms = String(Math.floor((elapsed % 1000) / 10)).padStart(2, '0');
+      document.getElementById('display').textContent = `${minutes}:${seconds}.${ms}`;
+    }
+
+    function start() {
+      if (running) return;
+      running = true;
+      startTime = Date.now();
+      interval = setInterval(updateDisplay, 10);
+    }
+
+    function stop() {
+      running = false;
+      clearInterval(interval);
+    }
+
+    function reset() {
+      stop();
+      document.getElementById('display').textContent = '00:00.00';
+    }
+
+    function toggleSpeedCubeMode() {
+      speedCubeMode = !speedCubeMode;
+      document.body.classList.toggle('speed-cube-mode');
+      document.getElementById('modeStatus').textContent = speedCubeMode ? 'Speed-Cube Mode (Use SPACE)' : 'Normal Mode';
+    }
+
+    // Spacebar support
+    window.addEventListener('keydown', (e) => {
+      if (speedCubeMode && e.code === 'Space') {
+        e.preventDefault();
+        if (running) {
+          stop();
+        } else {
+          reset();
+          start();
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>
