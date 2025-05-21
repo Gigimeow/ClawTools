@@ -1,261 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Neon Ping Pong Game</title>
-<style>
-  * {
-    box-sizing: border-box;
-  }
-  body {
-    margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: radial-gradient(ellipse at center, #0f0f0f 0%, #000000 100%);
-    color: white;
-    height: 100vh;
-    overflow: hidden;
-    background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
-  }
-  canvas {
-    display: block;
-    margin: auto;
-    background: transparent;
-    border: 2px solid #00eaff;
-    border-radius: 20px;
-    box-shadow: 0 0 20px cyan;
-  }
-  .hidden {
-    display: none;
-  }
-  .menu-screen {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    backdrop-filter: blur(5px);
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 10;
-  }
-  .glass-panel {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 20px;
-    padding: 40px;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
-    text-align: center;
-  }
-  button {
-    padding: 12px 24px;
-    margin: 10px;
-    font-size: 1rem;
-    border: none;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #00eaff, #007bff);
-    color: white;
-    cursor: pointer;
-    box-shadow: 0 0 10px #00f0ff;
-  }
-  button:hover {
-    transform: scale(1.05);
-    background: linear-gradient(135deg, #00faff, #009dff);
-    box-shadow: 0 0 20px #00f0ff;
-  }
-  input {
-    padding: 8px;
-    margin: 5px;
-    border-radius: 10px;
-    border: none;
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>Coming Soon!</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: radial-gradient(ellipse at center, #0f0f0f 0%, #000000 100%);
+      color: white;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+    }
+
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      padding: 40px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+      text-align: center;
+      animation: fadeIn 1s ease forwards;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 30px;
+      text-shadow: 0 0 10px cyan;
+    }
+
+    .button-link {
+      padding: 12px 24px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #00eaff, #007bff);
+      color: white;
+      transition: 0.3s ease;
+      box-shadow: 0 0 10px #00f0ff;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .button-link:hover {
+      transform: scale(1.05);
+      background: linear-gradient(135deg, #00faff, #009dff);
+      box-shadow: 0 0 20px #00f0ff;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2.2rem;
+      }
+
+      .glass-panel {
+        padding: 20px;
+      }
+    }
+  </style>
 </head>
 <body>
-<div id="mainMenu" class="menu-screen">
   <div class="glass-panel">
-    <h1>Neon Ping Pong</h1>
-    <input type="text" id="player1" placeholder="Player 1 Name"><br>
-    <input type="text" id="player2" placeholder="Player 2 Name"><br>
-    <button onclick="startGame()">Play</button>
-    <button onclick="alert('Use WASD for Player 1, Arrow Keys for Player 2 or touch screen. First to 10 wins.')">Instructions</button>
-    <button onclick="document.getElementById('settingsMenu').classList.remove('hidden')">Settings</button>
-    <button onclick="alert('ClawTools Ping Pong by Gigimeow1019')">Credits</button>
+    <h1>🚧 Coming Soon!</h1>
+    <a class="button-link" href="https://gigimeow.github.io/ClawTools/">⬅️ Back to Menu</a>
   </div>
-</div>
-<div id="settingsMenu" class="menu-screen hidden">
-  <div class="glass-panel">
-    <h2>Change Neon Colors</h2>
-    <label>Player 1 Color: <input type="color" id="colorP1" value="#00ff00"></label><br>
-    <label>Player 2 Color: <input type="color" id="colorP2" value="#ff0000"></label><br>
-    <button onclick="applySettings()">Apply</button>
-    <button onclick="document.getElementById('settingsMenu').classList.add('hidden')">Back</button>
-  </div>
-</div>
-<div id="pauseMenu" class="menu-screen hidden"></div>
-<div id="shopMenu" class="menu-screen hidden">
-  <div class="glass-panel">
-    <h2>Mini Shop</h2>
-    <button onclick="buyUpgrade('paddle')">Buy Neon Skins</button><br>
-    <button onclick="closeShop()">Close</button>
-  </div>
-</div>
-<canvas id="gameCanvas" width="800" height="500"></canvas>
-<script>
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
-let player1Name = "Player 1", player2Name = "Player 2";
-let p1Score = 0, p2Score = 0, paused = false, gameStarted = false;
-
-const paddle = { width: 15, height: 100 };
-const ball = { x: 400, y: 250, vx: 4, vy: 4, size: 12 };
-const p1 = { x: 30, y: 200, vy: 0, skin: "#0f0" };
-const p2 = { x: 755, y: 200, vy: 0, skin: "#f00" };
-
-const keys = { w: false, s: false, ArrowUp: false, ArrowDown: false };
-
-document.addEventListener("keydown", e => {
-  if (e.key === "Escape") togglePause();
-  if (keys.hasOwnProperty(e.key)) keys[e.key] = true;
-});
-
-document.addEventListener("keyup", e => {
-  if (keys.hasOwnProperty(e.key)) keys[e.key] = false;
-});
-
-canvas.addEventListener("touchmove", e => {
-  e.preventDefault();
-  for (let touch of e.touches) {
-    const rect = canvas.getBoundingClientRect();
-    const y = touch.clientY - rect.top - paddle.height / 2;
-    if (touch.clientX < canvas.width / 2) p1.y = y;
-    else p2.y = y;
-  }
-}, { passive: false });
-
-function drawRect(x, y, w, h, color) {
-  ctx.fillStyle = color;
-  ctx.fillRect(x, y, w, h);
-}
-
-function drawText(text, x, y, size = 24) {
-  ctx.fillStyle = "#fff";
-  ctx.font = `${size}px Segoe UI`;
-  ctx.fillText(text, x, y);
-}
-
-function drawCenterLine() {
-  ctx.strokeStyle = "#444";
-  ctx.setLineDash([5, 5]);
-  ctx.beginPath();
-  ctx.moveTo(canvas.width / 2, 0);
-  ctx.lineTo(canvas.width / 2, canvas.height);
-  ctx.stroke();
-  ctx.setLineDash([]);
-}
-
-function draw() {
-  drawRect(0, 0, canvas.width, canvas.height, "#111");
-  drawCenterLine();
-  drawRect(p1.x, p1.y, paddle.width, paddle.height, p1.skin);
-  drawRect(p2.x, p2.y, paddle.width, paddle.height, p2.skin);
-  drawRect(ball.x, ball.y, ball.size, ball.size, "#fff");
-  drawText(`${player1Name}: ${p1Score}`, 50, 40);
-  drawText(`${player2Name}: ${p2Score}`, 550, 40);
-}
-
-function update() {
-  if (keys.w) p1.y -= 6;
-  if (keys.s) p1.y += 6;
-  if (keys.ArrowUp) p2.y -= 6;
-  if (keys.ArrowDown) p2.y += 6;
-
-  p1.y = Math.max(0, Math.min(canvas.height - paddle.height, p1.y));
-  p2.y = Math.max(0, Math.min(canvas.height - paddle.height, p2.y));
-
-  ball.x += ball.vx;
-  ball.y += ball.vy;
-
-  if (ball.y <= 0 || ball.y + ball.size >= canvas.height) ball.vy *= -1;
-
-  if (ball.x <= p1.x + paddle.width && ball.y + ball.size >= p1.y && ball.y <= p1.y + paddle.height)
-    ball.vx *= -1;
-
-  if (ball.x + ball.size >= p2.x && ball.y + ball.size >= p2.y && ball.y <= p2.y + paddle.height)
-    ball.vx *= -1;
-
-  if (ball.x <= 0) { p2Score++; resetBall(); }
-  if (ball.x + ball.size >= canvas.width) { p1Score++; resetBall(); }
-
-  if (p1Score >= 10 || p2Score >= 10) {
-    paused = true;
-    document.getElementById("pauseMenu").innerHTML =
-      `<div class='glass-panel'><h2>${p1Score >= 10 ? player1Name : player2Name} Wins!</h2><button onclick='resetGame()'>Play Again</button></div>`;
-    showPause();
-  }
-}
-
-function gameLoop() {
-  if (gameStarted) {
-    if (!paused) {
-      update();
-      draw();
-    }
-    requestAnimationFrame(gameLoop);
-  }
-}
-
-function startGame() {
-  player1Name = document.getElementById("player1").value || "Player 1";
-  player2Name = document.getElementById("player2").value || "Player 2";
-  document.getElementById("mainMenu").classList.add("hidden");
-  document.getElementById("settingsMenu").classList.add("hidden");
-  if (!gameStarted) {
-    gameStarted = true;
-    gameLoop();
-  }
-}
-
-function resetBall() {
-  ball.x = canvas.width / 2;
-  ball.y = canvas.height / 2;
-  ball.vx *= -1;
-}
-
-function togglePause() {
-  paused = !paused;
-  paused ? showPause() : hidePause();
-}
-
-function showPause() {
-  document.getElementById("pauseMenu").classList.remove("hidden");
-}
-function hidePause() {
-  document.getElementById("pauseMenu").classList.add("hidden");
-}
-function resumeGame() { paused = false; hidePause(); }
-function resetGame() { location.reload(); }
-
-function openShop() {
-  document.getElementById("pauseMenu").classList.add("hidden");
-  document.getElementById("shopMenu").classList.remove("hidden");
-}
-function closeShop() {
-  document.getElementById("shopMenu").classList.add("hidden");
-  showPause();
-}
-function buyUpgrade(type) {
-  if (type === 'paddle') {
-    p1.skin = '#0ff';
-    p2.skin = '#f0f';
-    alert("Cool skins equipped!");
-  }
-}
-function applySettings() {
-  p1.skin = document.getElementById("colorP1").value;
-  p2.skin = document.getElementById("colorP2").value;
-  document.getElementById("settingsMenu").classList.add("hidden");
-}
-</script>
 </body>
 </html>
