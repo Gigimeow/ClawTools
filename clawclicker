@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Claw Clicker</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(to bottom right, #f5f5f5, #ffffff);
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      user-select: none;
+      position: relative;
+      padding-bottom: 60px;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+
+    #passwordScreen, #gameScreen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    input[type="password"] {
+      font-size: 1.2rem;
+      padding: 10px;
+      width: 200px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      margin-bottom: 15px;
+    }
+
+    .btn {
+      display: block;
+      padding: 10px 25px;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 8px;
+      background: #4285f4;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .btn:hover {
+      background: #3367d6;
+    }
+
+    #counter {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    #autoCounter {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+    }
+
+    #clickButton {
+      width: 140px;
+      height: 140px;
+      font-size: 1.5rem;
+      border: none;
+      border-radius: 50%;
+      background: linear-gradient(to bottom right, #4e54c8, #8f94fb);
+      color: white;
+      cursor: pointer;
+      transition: transform 0.1s;
+      box-shadow: 0 0 15px rgba(142, 148, 255, 0.4);
+    }
+
+    #clickButton:hover {
+      background: linear-gradient(to bottom right, #6a70e0, #a4a9ff);
+    }
+
+    #clickButton:active {
+      transform: scale(0.95);
+    }
+
+    .shop {
+      margin-top: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .upgrade {
+      background-color: #e0e0f8;
+      padding: 15px 20px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+      width: 260px;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .upgrade:hover {
+      background-color: #d0d0f0;
+    }
+
+    .upgrade:active {
+      background-color: #b0b0e0;
+    }
+
+    #footer {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      color: red;
+      font-size: 14px;
+      font-weight: bold;
+      max-width: 95vw;
+      user-select: text;
+    }
+
+    #bottomRightLink {
+      position: fixed;
+      bottom: 8px;
+      right: 8px;
+      font-size: 10px;
+      color: #555;
+      text-decoration: none;
+      font-family: Arial, sans-serif;
+      user-select: none;
+      opacity: 0.6;
+      transition: opacity 0.3s ease;
+      z-index: 9999;
+    }
+
+    #bottomRightLink:hover {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Password Screen -->
+<div id="passwordScreen">
+  <h1>Enter Password to Access Game</h1>
+  <input type="password" id="passwordInput" placeholder="Enter password" />
+  <button class="btn" onclick="checkPassword()">Submit</button>
+  <p id="errorMsg" style="color: red; font-weight: bold;"></p>
+</div>
+
+<!-- Game Screen -->
+<div id="gameScreen">
+  <h1>Claw Clicker</h1>
+  <div id="counter">Clicks: 0</div>
+  <div id="autoCounter">Auto Clicks per Second: 0</div>
+  <button id="clickButton">Click!</button>
+
+  <div class="shop">
+    <div class="upgrade" onclick="buyUpgrade(1)">+1 per click (Cost: <span id="cost1">10</span>)</div>
+    <div class="upgrade" onclick="buyUpgrade(5)">+5 per click (Cost: <span id="cost5">50</span>)</div>
+    <div class="upgrade" onclick="buyUpgrade(10)">+10 per click (Cost: <span id="cost10">100</span>)</div>
+    <div class="upgrade" onclick="buyAutoClicker(1)">+1 Auto Click/sec (Cost: <span id="autoCost1">100</span>)</div>
+    <div class="upgrade" onclick="buyAutoClicker(5)">+5 Auto Clicks/sec (Cost: <span id="autoCost5">500</span>)</div>
+    <div class="upgrade" onclick="buyAutoClicker(10)">+10 Auto Clicks/sec (Cost: <span id="autoCost10">1000</span>)</div>
+  </div>
+</div>
+
+<div id="footer">©️HNClawtools, THIS IS A PREVIEW AND IS NOT EXPECTED TO BE PERFECT, THIS IS UNRELEASED.</div>
+<a id="bottomRightLink" href="https://gigimeows-channels.neocities.org/" target="_blank">gigimeows-channels.neocities.org</a>
+
+<script>
+  // Show password screen initially
+  document.getElementById("passwordScreen").style.display = "flex";
+
+  function checkPassword() {
+    const input = document.getElementById("passwordInput").value;
+    const correctPassword = "clawclick"; // Change this to your preferred password
+    if (input === correctPassword) {
+      document.getElementById("passwordScreen").style.display = "none";
+      document.getElementById("gameScreen").style.display = "flex";
+    } else {
+      document.getElementById("errorMsg").innerText = "Wrong password!";
+    }
+  }
+
+  // Clicker game logic
+  let clicks = 0;
+  let clickPower = 1;
+  let autoClicksPerSecond = 0;
+
+  const upgradeCosts = {1: 10, 5: 50, 10: 100};
+  const autoClickCosts = {1: 100, 5: 500, 10: 1000};
+
+  const counterEl = document.getElementById("counter");
+  const autoCounterEl = document.getElementById("autoCounter");
+  const clickButton = document.getElementById("clickButton");
+
+  clickButton.addEventListener("click", () => {
+    clicks += clickPower;
+    updateDisplay();
+  });
+
+  function buyUpgrade(amount) {
+    const cost = upgradeCosts[amount];
+    if (clicks >= cost) {
+      clicks -= cost;
+      clickPower += amount;
+      upgradeCosts[amount] = Math.floor(upgradeCosts[amount] * 1.5);
+      document.getElementById("cost" + amount).innerText = upgradeCosts[amount];
+      updateDisplay();
+    } else {
+      alert("Not enough clicks!");
+    }
+  }
+
+  function buyAutoClicker(amount) {
+    const cost = autoClickCosts[amount];
+    if (clicks >= cost) {
+      clicks -= cost;
+      autoClicksPerSecond += amount;
+      autoClickCosts[amount] = Math.floor(autoClickCosts[amount] * 1.6);
+      document.getElementById("autoCost" + amount).innerText = autoClickCosts[amount];
+      updateDisplay();
+    } else {
+      alert("Not enough clicks!");
+    }
+  }
+
+  function updateDisplay() {
+    counterEl.innerText = `Clicks: ${clicks}`;
+    autoCounterEl.innerText = `Auto Clicks per Second: ${autoClicksPerSecond}`;
+  }
+
+  setInterval(() => {
+    clicks += autoClicksPerSecond;
+    updateDisplay();
+  }, 1000);
+</script>
+</body>
+</html>
