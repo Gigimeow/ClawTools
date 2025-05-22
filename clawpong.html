@@ -2,90 +2,300 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Coming Soon!</title>
+  <title>Advanced Ping Pong</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
+    html, body {
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: radial-gradient(ellipse at center, #0f0f0f 0%, #000000 100%);
-      color: white;
-      height: 100vh;
       overflow: hidden;
+      touch-action: none;
+      font-family: sans-serif;
+    }
+    canvas {
+      display: block;
+      background: black;
+    }
+    #ui {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
-    }
-
-    .glass-panel {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 20px;
-      padding: 40px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
-      text-align: center;
-      animation: fadeIn 1s ease forwards;
-    }
-
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 30px;
-      text-shadow: 0 0 10px cyan;
-    }
-
-    .button-link {
-      padding: 12px 24px;
-      font-size: 1.1rem;
-      cursor: pointer;
-      border: none;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #00eaff, #007bff);
+      flex-direction: column;
+      background: rgba(0,0,0,0.8);
       color: white;
-      transition: 0.3s ease;
-      box-shadow: 0 0 10px #00f0ff;
-      text-decoration: none;
-      display: inline-block;
+      z-index: 10;
     }
-
-    .button-link:hover {
-      transform: scale(1.05);
-      background: linear-gradient(135deg, #00faff, #009dff);
-      box-shadow: 0 0 20px #00f0ff;
+    button {
+      margin: 10px;
+      padding: 12px 24px;
+      font-size: 18px;
+      cursor: pointer;
     }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 2.2rem;
-      }
-
-      .glass-panel {
-        padding: 20px;
-      }
+    .hidden {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <div class="glass-panel">
-    <h1>🚧 Coming Soon!</h1>
-    <a class="button-link" href="https://gigimeow.github.io/ClawTools/">⬅️ Back to Menu</a>
+<canvas id="gameCanvas"></canvas>
+
+<!-- UI Menus -->
+<div id="ui">
+  <div id="mainMenu">
+    <h1>Ping Pong Game</h1>
+    <button onclick="openDifficulty()">Play</button>
+    <button onclick="showInstructions()">Instructions</button>
+    <button onclick="toggleSettings()">Settings</button>
   </div>
 
-  <script>
-  // Disable right-click context menu
-  document.addEventListener("contextmenu", function (e) {
-    e.preventDefault();
-  });
-</script>
+  <div id="difficultyMenu" class="hidden">
+    <h2>Select Difficulty</h2>
+    <button onclick="startGame('easy')">Easy</button>
+    <button onclick="startGame('medium')">Medium</button>
+    <button onclick="startGame('hard')">Hard</button>
+    <button onclick="show4PlayerWarning()">4 Player</button>
+    <button onclick="backToMain()">Back</button>
+  </div>
 
+  <div id="instructions" class="hidden">
+    <h2>Instructions</h2>
+    <p>Player 1: W/S</p>
+    <p>Player 2: ↑/↓</p>
+    <p>4P: A/D (Top), ←/→ (Bottom)</p>
+    <p>Touch: Drag paddle on your side</p>
+    <button onclick="backToMain()">Back</button>
+  </div>
+
+  <div id="settings" class="hidden">
+    <h2>Settings</h2>
+    <label>Background Color: <input type="color" id="bgColor" value="#000000"></label><br><br>
+    <label>Paddle Color: <input type="color" id="paddleColor" value="#ffffff"></label><br><br>
+    <button onclick="applySettings()">Apply</button>
+    <button onclick="backToMain()">Back</button>
+  </div>
+
+  <div id="fourPlayerWarning" class="hidden">
+    <h2>⚠️ 4-Player Mode Warning</h2>
+    <p>4-player is a bit broken right now, but you can still play it.</p>
+    <p>It is recommended that players work together and try not to let the ball go out.</p>
+    <button onclick="startGame('4player')">Continue</button>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// Disable right-click
+window.oncontextmenu = () => false;
+
+let paddleWidth = 20;
+let paddleHeight = 100;
+let ball, player1, player2, player3, player4;
+let keys = {};
+let mode = 'easy';
+let level = 1;
+let score = [0, 0];
+let ballSpeedBase = 5;
+let speedIncreaseFactor = 1.1;
+let bgColor = "#000000";
+let paddleColor = "#ffffff";
+
+function initGame() {
+  paddleHeight = 100;
+  paddleWidth = 20;
+
+  player1 = { x: 20, y: canvas.height / 2 - paddleHeight / 2 };
+  player2 = { x: canvas.width - 40, y: canvas.height / 2 - paddleHeight / 2 };
+  player3 = { y: 20, x: canvas.width / 2 - paddleHeight / 2 }; // top
+  player4 = { y: canvas.height - 40, x: canvas.width / 2 - paddleHeight / 2 }; // bottom
+
+  resetBall();
+  score = [0, 0];
+  level = 1;
+}
+
+function resetBall() {
+  ball = {
+    x: canvas.width / 2,
+    y: canvas.height / 2,
+    radius: 10,
+    dx: (Math.random() > 0.5 ? 1 : -1) * ballSpeedBase,
+    dy: (Math.random() > 0.5 ? 1 : -1) * ballSpeedBase,
+    baseSpeed: ballSpeedBase
+  };
+}
+
+function drawPaddle(p, vertical = true) {
+  ctx.fillStyle = paddleColor;
+  if (vertical)
+    ctx.fillRect(p.x, p.y, paddleWidth, paddleHeight);
+  else
+    ctx.fillRect(p.x, p.y, paddleHeight, paddleWidth);
+}
+
+function drawBall() {
+  ctx.beginPath();
+  ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+  ctx.fillStyle = "white";
+  ctx.fill();
+  ctx.closePath();
+}
+
+function drawScore() {
+  ctx.fillStyle = "white";
+  ctx.font = "24px sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText(`Score: ${score[0]} - ${score[1]}` + ((mode !== 'easy') ? ` | Level: ${level}` : ""), canvas.width / 2, 30);
+}
+
+function moveBall() {
+  ball.x += ball.dx;
+  ball.y += ball.dy;
+
+  // Wall collision
+  if (ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height) {
+    ball.dy *= -1;
+  }
+
+  // Paddle collisions
+  if (ball.x - ball.radius < player1.x + paddleWidth && ball.y > player1.y && ball.y < player1.y + paddleHeight) {
+    ball.dx = Math.abs(ball.dx);
+    ball.x = player1.x + paddleWidth + ball.radius;
+    increaseSpeed();
+  }
+
+  if (ball.x + ball.radius > player2.x && ball.y > player2.y && ball.y < player2.y + paddleHeight) {
+    ball.dx = -Math.abs(ball.dx);
+    ball.x = player2.x - ball.radius;
+    increaseSpeed();
+  }
+
+  if (mode === '4player') {
+    if (ball.y - ball.radius < player3.y + paddleWidth && ball.x > player3.x && ball.x < player3.x + paddleHeight) {
+      ball.dy = Math.abs(ball.dy);
+      ball.y = player3.y + paddleWidth + ball.radius;
+      increaseSpeed();
+    }
+
+    if (ball.y + ball.radius > player4.y && ball.x > player4.x && ball.x < player4.x + paddleHeight) {
+      ball.dy = -Math.abs(ball.dy);
+      ball.y = player4.y - ball.radius;
+      increaseSpeed();
+    }
+  }
+
+  // Miss = reset level
+  if (ball.x < 0 || ball.x > canvas.width) {
+    if (ball.x < 0) score[1]++;
+    else score[0]++;
+    level = 1;
+    resetBall();
+  }
+}
+
+function increaseSpeed() {
+  if (mode === 'medium' || mode === '4player') {
+    ball.dx *= speedIncreaseFactor;
+    ball.dy *= speedIncreaseFactor;
+    level++;
+  } else if (mode === 'hard') {
+    ball.dx *= speedIncreaseFactor * 1.5;
+    ball.dy *= speedIncreaseFactor * 1.5;
+    level++;
+  }
+}
+
+function draw() {
+  ctx.fillStyle = bgColor;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  drawPaddle(player1);
+  drawPaddle(player2);
+  if (mode === '4player') {
+    drawPaddle(player3, false);
+    drawPaddle(player4, false);
+  }
+  drawBall();
+  drawScore();
+  moveBall();
+  requestAnimationFrame(draw);
+}
+
+function startGame(selectedMode) {
+  mode = selectedMode;
+  document.getElementById("ui").style.display = "none";
+  initGame();
+  draw();
+}
+
+function openDifficulty() {
+  hideAllMenus();
+  document.getElementById('difficultyMenu').classList.remove('hidden');
+}
+
+function backToMain() {
+  hideAllMenus();
+  document.getElementById('mainMenu').classList.remove('hidden');
+}
+
+function showInstructions() {
+  hideAllMenus();
+  document.getElementById('instructions').classList.remove('hidden');
+}
+
+function toggleSettings() {
+  hideAllMenus();
+  document.getElementById('settings').classList.remove('hidden');
+}
+
+function applySettings() {
+  bgColor = document.getElementById('bgColor').value;
+  paddleColor = document.getElementById('paddleColor').value;
+  backToMain();
+}
+
+function show4PlayerWarning() {
+  hideAllMenus();
+  document.getElementById('fourPlayerWarning').classList.remove('hidden');
+}
+
+function hideAllMenus() {
+  document.querySelectorAll('#ui > div').forEach(div => div.classList.add('hidden'));
+}
+
+window.addEventListener("keydown", (e) => keys[e.key] = true);
+window.addEventListener("keyup", (e) => keys[e.key] = false);
+
+function updateControls() {
+  if (keys["w"]) player1.y -= 5;
+  if (keys["s"]) player1.y += 5;
+  if (keys["ArrowUp"]) player2.y -= 5;
+  if (keys["ArrowDown"]) player2.y += 5;
+  if (mode === '4player') {
+    if (keys["a"]) player3.x -= 5;
+    if (keys["d"]) player3.x += 5;
+    if (keys["ArrowLeft"]) player4.x -= 5;
+    if (keys["ArrowRight"]) player4.x += 5;
+  }
+  requestAnimationFrame(updateControls);
+}
+updateControls();
+
+canvas.addEventListener("touchmove", (e) => {
+  for (let touch of e.touches) {
+    const x = touch.clientX;
+    const y = touch.clientY;
+    if (x < canvas.width / 2) player1.y = y - paddleHeight / 2;
+    else player2.y = y - paddleHeight / 2;
+    if (mode === '4player') {
+      if (y < canvas.height / 2) player3.x = x - paddleHeight / 2;
+      else player4.x = x - paddleHeight / 2;
+    }
+  }
+});
+</script>
 </body>
 </html>
