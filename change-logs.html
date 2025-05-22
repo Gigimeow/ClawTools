@@ -1,1 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ClawTools Change Logs</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: radial-gradient(ellipse at center, #0f0f0f 0%, #000000 100%);
+      background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+      overflow: hidden;
+    }
 
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    h1, h2 {
+      font-size: 4vw;
+      margin: 0.5vh 0;
+      text-shadow: 0 0 10px cyan;
+      text-align: center;
+    }
+
+    p {
+      font-size: 1.5vw;
+      color: #ccc;
+      margin: 1vh 0;
+      text-align: center;
+    }
+
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 2vw;
+      padding: 2vw;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+      width: 100%;
+      max-width: 800px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-y: auto;
+    }
+
+    button, .button-link {
+      padding: 1.2vh 2vw;
+      font-size: 1.5vw;
+      margin: 1vh 0;
+      cursor: pointer;
+      border: none;
+      border-radius: 1vw;
+      background: linear-gradient(135deg, #00eaff, #007bff);
+      color: white;
+      transition: 0.3s ease;
+      box-shadow: 0 0 10px #00f0ff;
+      text-decoration: none;
+      text-align: center;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    button:hover, .button-link:hover {
+      transform: scale(1.05);
+      background: linear-gradient(135deg, #00faff, #009dff);
+      box-shadow: 0 0 20px #00f0ff;
+    }
+
+    .corner-button {
+      position: absolute;
+      padding: 1vh 1.5vw;
+      font-size: 1.2vw;
+      border-radius: 1vw;
+      background: linear-gradient(135deg, #00eaff, #007bff);
+      color: white;
+      box-shadow: 0 0 10px #00f0ff;
+      border: none;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    .corner-button:hover {
+      background: linear-gradient(135deg, #00faff, #009dff);
+      box-shadow: 0 0 20px #00f0ff;
+    }
+
+    .top-left {
+      top: 15px;
+      left: 15px;
+    }
+
+    .bottom-left {
+      bottom: 15px;
+      left: 15px;
+    }
+
+    .version-buttons {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5vh;
+      margin-top: 2vh;
+    }
+
+    .version-buttons.show {
+      display: flex;
+    }
+
+    .spacer {
+      height: 3vh;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Old Versions Button -->
+  <button class="corner-button top-left" onclick="toggleVersions()">Old Versions</button>
+
+  <!-- Back Button -->
+  <button class="corner-button bottom-left" onclick="window.location.href='https://gigimeow.github.io/ClawTools/'">Back</button>
+
+  <div class="glass-panel">
+    <h2>Next Coming</h2>
+    <p>N/A</p>
+
+    <div class="spacer"></div>
+
+    <h1>Change Logs</h1>
+    <p>• Revamped the main menu layout</p>
+    <p>• Introduced scroll bars for overflowing menus</p>
+
+    <div class="spacer"></div>
+
+    <div id="versionsPanel" class="version-buttons">
+      <h2>Old Versions</h2>
+      <button onclick="window.location.href='https://gigimeow.github.io/ClawTools/old_menue'">v1.6.2</button>
+      <button onclick="window.location.href='https://gigimeow.github.io/ClawTools/'">v2.1</button>
+    </div>
+  </div>
+
+  <script>
+    function toggleVersions() {
+      const panel = document.getElementById("versionsPanel");
+      panel.classList.toggle("show");
+    }
+  </script>
+</body>
+</html>
