@@ -9,110 +9,204 @@
       overflow: hidden;
       touch-action: none;
     }
+
     canvas {
       background: #000;
       display: block;
     }
+
+    #passwordScreen, #gameScreen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+      background-color: #f4f4f4;
+    }
+
+    input[type="password"] {
+      font-size: 1.2rem;
+      padding: 10px;
+      width: 200px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      margin-bottom: 15px;
+    }
+
+    .btn {
+      display: block;
+      padding: 10px 25px;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 8px;
+      background: #4285f4;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .btn:hover {
+      background: #3367d6;
+    }
+
+    #footer {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      color: red;
+      font-size: 14px;
+      font-weight: bold;
+      max-width: 95vw;
+      user-select: text;
+    }
+
+    #bottomRightLink {
+      position: fixed;
+      bottom: 8px;
+      right: 8px;
+      font-size: 10px;
+      color: #555;
+      text-decoration: none;
+      font-family: Arial, sans-serif;
+      user-select: none;
+      opacity: 0.6;
+      transition: opacity 0.3s ease;
+      z-index: 9999;
+    }
+
+    #bottomRightLink:hover {
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
-<canvas id="gameCanvas"></canvas>
+
+<!-- Password Screen -->
+<div id="passwordScreen">
+  <h1>Enter Password to Access Game</h1>
+  <input type="password" id="passwordInput" placeholder="Enter password" />
+  <button class="btn" onclick="checkPassword()">Submit</button>
+  <p id="errorMsg" style="color: red; font-weight: bold;"></p>
+</div>
+
+<!-- Game Screen -->
+<div id="gameScreen">
+  <canvas id="gameCanvas"></canvas>
+  <div id="footer">©️HNClawtools, THIS IS A PREVIEW AND IS NOT EXPECTED TO BE PERFECT, THIS IS UNRELEASED.</div>
+  <a id="bottomRightLink" href="https://gigimeows-channels.neocities.org/" target="_blank">gigimeows-channels.neocities.org</a>
+</div>
 
 <script>
-  const canvas = document.getElementById("gameCanvas");
-  const ctx = canvas.getContext("2d");
+  // Show password screen on load
+  document.getElementById("passwordScreen").style.display = "flex";
 
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-
-  const paddleWidth = 20;
-  const paddleHeight = 100;
-
-  const player1 = { x: 20, y: canvas.height / 2 - paddleHeight / 2 };
-  const player2 = { x: canvas.width - 40, y: canvas.height / 2 - paddleHeight / 2 };
-  const ball = {
-    x: canvas.width / 2,
-    y: canvas.height / 2,
-    radius: 10,
-    dx: 5,
-    dy: 5,
-  };
-
-  function drawPaddle(p) {
-    ctx.fillStyle = "white";
-    ctx.fillRect(p.x, p.y, paddleWidth, paddleHeight);
-  }
-
-  function drawBall() {
-    ctx.beginPath();
-    ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-    ctx.fillStyle = "white";
-    ctx.fill();
-    ctx.closePath();
-  }
-
-  function moveBall() {
-    ball.x += ball.dx;
-    ball.y += ball.dy;
-
-    // Top/bottom collision
-    if (ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height) {
-      ball.dy *= -1;
-    }
-
-    // Paddle collisions
-    if (
-      ball.x - ball.radius < player1.x + paddleWidth &&
-      ball.y > player1.y &&
-      ball.y < player1.y + paddleHeight
-    ) {
-      ball.dx *= -1;
-      ball.x = player1.x + paddleWidth + ball.radius;
-    }
-
-    if (
-      ball.x + ball.radius > player2.x &&
-      ball.y > player2.y &&
-      ball.y < player2.y + paddleHeight
-    ) {
-      ball.dx *= -1;
-      ball.x = player2.x - ball.radius;
-    }
-
-    // Left/right out of bounds: reset ball
-    if (ball.x < 0 || ball.x > canvas.width) {
-      ball.x = canvas.width / 2;
-      ball.y = canvas.height / 2;
-      ball.dx = -ball.dx;
+  function checkPassword() {
+    const input = document.getElementById("passwordInput").value;
+    if (input.toLowerCase() === "clawpong") {
+      document.getElementById("passwordScreen").style.display = "none";
+      document.getElementById("gameScreen").style.display = "block";
+      startGame();
+    } else {
+      document.getElementById("errorMsg").textContent = "Incorrect password.";
     }
   }
 
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawPaddle(player1);
-    drawPaddle(player2);
-    drawBall();
-    moveBall();
-    requestAnimationFrame(draw);
-  }
+  function startGame() {
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
 
-  draw();
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-  // Touch handling
-  canvas.addEventListener("touchmove", (e) => {
-    for (let touch of e.touches) {
-      const x = touch.clientX;
-      const y = touch.clientY;
+    const paddleWidth = 20;
+    const paddleHeight = 100;
 
-      if (x < canvas.width / 2) {
-        // Player 1 side
-        player1.y = y - paddleHeight / 2;
-      } else {
-        // Player 2 side
-        player2.y = y - paddleHeight / 2;
+    const player1 = { x: 20, y: canvas.height / 2 - paddleHeight / 2 };
+    const player2 = { x: canvas.width - 40, y: canvas.height / 2 - paddleHeight / 2 };
+    const ball = {
+      x: canvas.width / 2,
+      y: canvas.height / 2,
+      radius: 10,
+      dx: 5,
+      dy: 5,
+    };
+
+    function drawPaddle(p) {
+      ctx.fillStyle = "white";
+      ctx.fillRect(p.x, p.y, paddleWidth, paddleHeight);
+    }
+
+    function drawBall() {
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+      ctx.fillStyle = "white";
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    function moveBall() {
+      ball.x += ball.dx;
+      ball.y += ball.dy;
+
+      // Top/bottom collision
+      if (ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height) {
+        ball.dy *= -1;
+      }
+
+      // Paddle collisions
+      if (
+        ball.x - ball.radius < player1.x + paddleWidth &&
+        ball.y > player1.y &&
+        ball.y < player1.y + paddleHeight
+      ) {
+        ball.dx *= -1;
+        ball.x = player1.x + paddleWidth + ball.radius;
+      }
+
+      if (
+        ball.x + ball.radius > player2.x &&
+        ball.y > player2.y &&
+        ball.y < player2.y + paddleHeight
+      ) {
+        ball.dx *= -1;
+        ball.x = player2.x - ball.radius;
+      }
+
+      // Left/right out of bounds: reset ball
+      if (ball.x < 0 || ball.x > canvas.width) {
+        ball.x = canvas.width / 2;
+        ball.y = canvas.height / 2;
+        ball.dx = -ball.dx;
       }
     }
-  });
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawPaddle(player1);
+      drawPaddle(player2);
+      drawBall();
+      moveBall();
+      requestAnimationFrame(draw);
+    }
+
+    draw();
+
+    // Touch handling
+    canvas.addEventListener("touchmove", (e) => {
+      for (let touch of e.touches) {
+        const x = touch.clientX;
+        const y = touch.clientY;
+
+        if (x < canvas.width / 2) {
+          player1.y = y - paddleHeight / 2;
+        } else {
+          player2.y = y - paddleHeight / 2;
+        }
+      }
+    });
+  }
 </script>
+
 </body>
 </html>
