@@ -1,1 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ClawTools Menu</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: radial-gradient(ellipse at center, #0f0f0f 0%, #000000 100%);
+      color: white;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+    }
+
+    h1, h2 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px cyan;
+    }
+
+    #mainMenu, .submenu, #creditsScreen {
+      display: none;
+      flex-direction: column;
+      gap: 20px;
+      text-align: center;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      width: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      animation: fadeIn 1s ease forwards;
+    }
+
+    #mainMenu.active, #gamesMenu.active, #toolsMenu.active, #creditsScreen.active, #footballMenu.active {
+      display: flex;
+    }
+
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      padding: 40px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+      transition: transform 0.3s ease;
+      max-width: 90%;
+    }
+
+    button, .button-link {
+      padding: 12px 24px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #00eaff, #007bff);
+      color: white;
+      transition: 0.3s ease;
+      box-shadow: 0 0 10px #00f0ff;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    button:hover, .button-link:hover {
+      transform: scale(1.05);
+      background: linear-gradient(135deg, #00faff, #009dff);
+      box-shadow: 0 0 20px #00f0ff;
+    }
+
+    .disabled-button {
+      background: #222;
+      box-shadow: none;
+      color: #aaa;
+      cursor: not-allowed;
+    }
+
+    .disabled-button:hover {
+      transform: none;
+    }
+
+    #backButton {
+      margin-top: 20px;
+      background: linear-gradient(135deg, #555, #222);
+      box-shadow: 0 0 10px #444;
+    }
+
+    #backButton:hover {
+      background: linear-gradient(135deg, #777, #333);
+    }
+
+    p, a {
+      color: #ccc;
+      font-size: 1rem;
+      margin-top: 10px;
+    }
+
+    a {
+      color: #00d0ff;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      h1, h2 {
+        font-size: 2rem;
+      }
+      .glass-panel {
+        padding: 20px;
+      }
+    }
+
+    /* Tiny Preview Button */
+    #previewBtn {
+      position: absolute;
+      bottom: 5px;
+      right: 8px;
+      font-size: 0.6rem;
+      padding: 3px 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      text-decoration: none;
+      color: #888;
+      transition: 0.2s ease;
+      z-index: 999;
+    }
+
+    #previewBtn:hover {
+      color: #fff;
+      background: rgba(0, 255, 255, 0.2);
+    }
+  </style>
+
+  <script>
+    window.addEventListener('contextmenu', e => e.preventDefault());
+    window.addEventListener('keydown', function(e) {
+      if (
+        e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J" || e.key === "C")) ||
+        (e.ctrlKey && e.key === "U")
+      ) {
+        e.preventDefault();
+        return false;
+      }
+    });
+
+    function showMenu(menuId) {
+      document.getElementById("mainMenu").classList.remove("active");
+      document.getElementById("gamesMenu").classList.remove("active");
+      document.getElementById("toolsMenu").classList.remove("active");
+      document.getElementById("creditsScreen").classList.remove("active");
+      document.getElementById("footballMenu").classList.remove("active");
+      document.getElementById(menuId).classList.add("active");
+    }
+
+    function goBack() {
+      document.getElementById("gamesMenu").classList.remove("active");
+      document.getElementById("toolsMenu").classList.remove("active");
+      document.getElementById("creditsScreen").classList.remove("active");
+      document.getElementById("footballMenu").classList.remove("active");
+      document.getElementById("mainMenu").classList.add("active");
+    }
+
+    function backToGames() {
+      document.getElementById("footballMenu").classList.remove("active");
+      document.getElementById("gamesMenu").classList.add("active");
+    }
+  </script>
+</head>
+<body>
+  <!-- Main Menu -->
+  <div id="mainMenu" class="glass-panel active">
+    <h1>ClawTools Menu</h1>
+    <button onclick="showMenu('gamesMenu')">🎮 Games</button>
+    <button onclick="showMenu('toolsMenu')">🛠️ Tools</button>
+    <a class="button-link" href="https://gigimeow.github.io/ClawTools/quizzes" target="_blank">📚 Quizzes</a>
+    <button onclick="showMenu('creditsScreen')">⭐ Credits</button>
+    <p>Visit my friend's website of fun games: <a href="https://gamesrf.neocities.org/" target="_blank">Gamesrf</a></p>
+  </div>
+
+  <!-- Games Menu -->
+  <div id="gamesMenu" class="submenu glass-panel">
+    <h2>🎮 Select a Game</h2>
+    <button onclick="showMenu('footballMenu')">⚽ Football Game</button>
+    <a class="button-link" href="https://gigimeow.github.io/ClawTools/shooter" target="_blank">🔫 Shooter Game</a>
+    <a class="button-link" href="https://gigimeow.github.io/ClawTools/platformergame" target="_blank">🕹️ Platformer Game</a>
+    <a class="button-link" href="https://gigimeow.github.io/ClawTools/galaxy" target="_blank">🌌 Galaxy Game</a>
+    <a class="button-link" href="https://gigimeow.github.io/ClawTools/minecraft" target="_blank">⛏️ Minecraft</a>
+    <a class="button-link" href="https://gigimeow.github.io/ClawTools/clawclicker" target="_blank">👈Clicker</a>
+    <a class="button-link" href="https://gigimeow.github.io/ClawTools/clawpong" target="_blank">⚽Pong</a>
+    <div class="button-link disabled-button">🧪 More coming soon!</div>
+    <button id="backButton" onclick="goBack()">⬅️ Back</button>
+  </div>
+
+  <!-- Football Game Submenu -->
+  <div id="footballMenu" class="submenu glass-panel">
+    <h2>⚽ Football Game Versions</h2>
+    <a class="button-link" href="https://gigimeow.github.io/ClawTools/footballgame1" target="_blank">V1</a>
+    <a class="button-link" href="https://gigimeow.github.io/ClawTools/footballgame2" target="_blank">V2</a>
+    <button id="backButton" onclick="backToGames()">⬅️ Back to Games</button>
+  </div>
+
+  <!-- Tools Menu -->
+  <div id="toolsMenu" class="submenu glass-panel">
+    <h2>🛠️ Select a Tool</h2>
+    <a class="button-link" href="https://gigimeow.github.io/ClawTools/paint" target="_blank">🎨 Paint</a>
+    <a class="button-link" href="https://gigimeow.github.io/ClawTools/notepad" target="_blank">📝 Notepad</a>
+    <a class="button-link" href="https://gigimeow.github.io/ClawTools/calculator" target="_blank">🧮 Calculator</a>
+    <a class="button-link" href="https://gigimeow.github.io/ClawTools/timer">⏱ Timer</a>
+
+    <button id="backButton" onclick="goBack()">⬅️ Back</button>
+  </div>
+
+  <!-- Credits Screen -->
+  <div id="creditsScreen" class="submenu glass-panel">
+    <h2>⭐ Credits</h2>
+    <p>ClawTools made by <strong>Gigimeow1019</strong></p>
+    <button onclick="goBack()">⬅️ Back</button>
+  </div>
+
+  <!-- Hidden Preview Button -->
+  <a id="previewBtn" href="https://gigimeow.github.io/ClawTools/Preview-auth" target="_blank">Preview</a>
+</body>
+</html>
