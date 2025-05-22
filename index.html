@@ -19,7 +19,6 @@
       align-items: center;
       justify-content: center;
       background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
-      position: relative;
     }
 
     h1, h2 {
@@ -41,7 +40,6 @@
       top: 0;
       left: 0;
       animation: fadeIn 1s ease forwards;
-      overflow: auto; /* Enable scroll when needed */
     }
 
     #mainMenu.active, #gamesMenu.active, #toolsMenu.active, #creditsScreen.active, #footballMenu.active {
@@ -57,8 +55,6 @@
       box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
       transition: transform 0.3s ease;
       max-width: 90%;
-      max-height: 90%;
-      overflow: auto;
     }
 
     button, .button-link {
@@ -149,27 +145,6 @@
       color: #fff;
       background: rgba(0, 255, 255, 0.2);
     }
-
-    /* Change Logs Button */
-    #changelogBtn {
-      position: absolute;
-      top: 10px;
-      right: 12px;
-      font-size: 0.8rem;
-      padding: 6px 12px;
-      border-radius: 10px;
-      background: rgba(0, 255, 255, 0.1);
-      color: #00eaff;
-      text-decoration: none;
-      z-index: 1000;
-      box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
-      transition: 0.2s ease;
-    }
-
-    #changelogBtn:hover {
-      background: rgba(0, 255, 255, 0.3);
-      color: white;
-    }
   </style>
 
   <script>
@@ -209,9 +184,6 @@
   </script>
 </head>
 <body>
-  <!-- Change Logs Button -->
-  <a id="changelogBtn" href="https://gigimeow.github.io/ClawTools/change-logs" target="_blank">📝 Change Logs</a>
-
   <!-- Main Menu -->
   <div id="mainMenu" class="glass-panel active">
     <h1>ClawTools Menu</h1>
@@ -251,6 +223,7 @@
     <a class="button-link" href="https://gigimeow.github.io/ClawTools/notepad" target="_blank">📝 Notepad</a>
     <a class="button-link" href="https://gigimeow.github.io/ClawTools/calculator" target="_blank">🧮 Calculator</a>
     <a class="button-link" href="https://gigimeow.github.io/ClawTools/timer">⏱ Timer</a>
+
     <button id="backButton" onclick="goBack()">⬅️ Back</button>
   </div>
 
