@@ -1,0 +1,18 @@
+FOR ONES WITHOUT SCRIPT TAG...:
+
+<script>
+  // Disable right-click context menu
+  document.addEventListener("contextmenu", function (e) {
+    e.preventDefault();
+  });
+</script>
+
+
+
+
+FOR ONES WITH SCRIPT TAG...:
+
+// Disable right-click
+document.addEventListener("contextmenu", function (e) {
+  e.preventDefault();
+});
