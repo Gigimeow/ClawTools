@@ -109,33 +109,15 @@
       position: fixed;
       bottom: 10px;
       left: 10px;
-      color: red;
+      color: black; /* Changed from red to black */
       font-size: 14px;
       font-weight: bold;
       max-width: 95vw;
       user-select: text;
     }
-
-    #bottomRightLink {
-      position: fixed;
-      bottom: 8px;
-      right: 8px;
-      font-size: 10px;
-      color: #555;
-      text-decoration: none;
-      font-family: Arial, sans-serif;
-      user-select: none;
-      opacity: 0.6;
-      transition: opacity 0.3s ease;
-      z-index: 9999;
-    }
-
-    #bottomRightLink:hover {
-      opacity: 1;
-    }
   </style>
 </head>
-<body>
+<body oncontextmenu="return false">
 
 <!-- Game Screen -->
 <div id="gameScreen">
@@ -155,7 +137,6 @@
 </div>
 
 <div id="footer">©️ClawTools</div>
-<a id="bottomRightLink" href="https://gigimeows-channels.neocities.org/" target="_blank">gigimeows-channels.neocities.org</a>
 
 <script>
   // Clicker game logic
