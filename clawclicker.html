@@ -25,19 +25,10 @@
       margin-bottom: 20px;
     }
 
-    #passwordScreen, #gameScreen {
-      display: none;
+    #gameScreen {
+      display: flex;
       flex-direction: column;
       align-items: center;
-    }
-
-    input[type="password"] {
-      font-size: 1.2rem;
-      padding: 10px;
-      width: 200px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      margin-bottom: 15px;
     }
 
     .btn {
@@ -146,14 +137,6 @@
 </head>
 <body>
 
-<!-- Password Screen -->
-<div id="passwordScreen">
-  <h1>Enter Password to Access Game</h1>
-  <input type="password" id="passwordInput" placeholder="Enter password" />
-  <button class="btn" onclick="checkPassword()">Submit</button>
-  <p id="errorMsg" style="color: red; font-weight: bold;"></p>
-</div>
-
 <!-- Game Screen -->
 <div id="gameScreen">
   <h1>Claw Clicker</h1>
@@ -171,24 +154,10 @@
   </div>
 </div>
 
-<div id="footer">©️HNClawtools, THIS IS A PREVIEW AND IS NOT EXPECTED TO BE PERFECT, THIS IS UNRELEASED.</div>
+<div id="footer">©️ClawTools</div>
 <a id="bottomRightLink" href="https://gigimeows-channels.neocities.org/" target="_blank">gigimeows-channels.neocities.org</a>
 
 <script>
-  // Show password screen initially
-  document.getElementById("passwordScreen").style.display = "flex";
-
-  function checkPassword() {
-    const input = document.getElementById("passwordInput").value;
-    const correctPassword = "clawclick"; // Change this to your preferred password
-    if (input === correctPassword) {
-      document.getElementById("passwordScreen").style.display = "none";
-      document.getElementById("gameScreen").style.display = "flex";
-    } else {
-      document.getElementById("errorMsg").innerText = "Wrong password!";
-    }
-  }
-
   // Clicker game logic
   let clicks = 0;
   let clickPower = 1;
