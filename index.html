@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ClawTools Ultra UI</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+      background: linear-gradient(130deg, #1f1f1f, #0d0d0d);
+      overflow: hidden;
+      color: #fff;
+      position: relative;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      text-align: center;
+      user-select: none;
+    }
+
+    canvas#particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+
+    #intro {
+      font-size: 5rem;
+      background: linear-gradient(45deg, #00f0ff, #ff00c8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      border-right: 4px solid #ff00c8;
+      padding-right: 5px;
+      animation: pulseGlow 3s infinite;
+      z-index: 2;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% {
+        text-shadow: 0 0 10px var(--glow1, #00f0ff), 0 0 20px var(--glow2, #ff00c8);
+      }
+      50% {
+        text-shadow: 0 0 30px var(--glow1, #00f0ff), 0 0 60px var(--glow2, #ff00c8);
+      }
+    }
+
+    .container {
+      backdrop-filter: blur(20px);
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 30px;
+      padding: 40px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 0 40px rgba(0, 255, 255, 0.2);
+      border: 2px solid rgba(0, 255, 255, 0.2);
+      z-index: 2;
+      opacity: 0;
+      display: none;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      background: linear-gradient(45deg, #00f0ff, #ff00c8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
+      animation: pulseGlow 3s infinite;
+    }
+
+    .clock {
+      font-size: 2rem;
+      margin: 20px 0;
+      color: #0ff;
+      animation: flicker 2s infinite;
+    }
+
+    @keyframes flicker {
+      0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+        opacity: 1;
+      }
+      20%, 24%, 55% {
+        opacity: 0.4;
+      }
+    }
+
+    .btn {
+      background: linear-gradient(90deg, #00f0ff, #ff00c8);
+      border: none;
+      padding: 15px 40px;
+      font-size: 1.2rem;
+      border-radius: 50px;
+      cursor: pointer;
+      color: white;
+      margin-top: 20px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
+    }
+
+    .credits {
+      margin-top: 40px;
+      font-size: 0.9rem;
+      opacity: 0.5;
+    }
+
+    .toggle {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid #fff3;
+      padding: 10px 20px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      color: #fff;
+      font-weight: bold;
+      z-index: 10;
+    }
+
+    .toggle:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  </style>
+</head>
+<body oncontextmenu="return false">
+  <canvas id="particles"></canvas>
+
+  <div class="toggle" onclick="toggleTheme()">🎨 Theme</div>
+
+  <div id="intro"></div>
+
+  <div class="container">
+    <h1>🌟 ClawTools UI v1.0</h1>
+    <div class="clock" id="clock">00:00:00</div>
+    <button class="btn" onclick="window.location.href='https://gigimeow.github.io/ClawTools/main'">🚀 Launch Tool</button>
+    <div class="credits">©️ Clawtools 2025 — Made by Gigimeow1019 (HN)</div>
+  </div>
+
+  <script>
+    // Typing Intro
+    const introText = "Welcome to ClawTools";
+    const introElement = document.getElementById('intro');
+    const container = document.querySelector('.container');
+    let index = 0;
+
+    function typeIntro() {
+      if (index < introText.length) {
+        introElement.textContent += introText.charAt(index);
+        index++;
+        setTimeout(typeIntro, 40);
+      } else {
+        introElement.style.borderRight = 'none';
+        setTimeout(() => {
+          introElement.style.transition = 'opacity 1s ease';
+          introElement.style.opacity = '0';
+          container.style.display = 'block';
+          container.style.opacity = '0';
+          setTimeout(() => {
+            container.style.transition = 'opacity 1s ease';
+            container.style.opacity = '1';
+            introElement.style.display = 'none';
+          }, 50);
+        }, 1000);
+      }
+    }
+
+    typeIntro();
+
+    // Clock
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('clock').textContent = now.toLocaleTimeString();
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Theme Gradient Swapper
+    const themes = [
+      { from: "#00f0ff", to: "#ff00c8" },
+      { from: "#00ff88", to: "#ff8800" },
+      { from: "#aa00ff", to: "#ffe600" }
+    ];
+    let currentTheme = 0;
+
+    function applyTheme(theme) {
+      document.documentElement.style.setProperty('--glow1', theme.from);
+      document.documentElement.style.setProperty('--glow2', theme.to);
+      document.getElementById("intro").style.background = `linear-gradient(45deg, ${theme.from}, ${theme.to})`;
+      document.querySelector("h1").style.background = `linear-gradient(45deg, ${theme.from}, ${theme.to})`;
+      document.querySelector(".btn").style.background = `linear-gradient(90deg, ${theme.from}, ${theme.to})`;
+      document.querySelector(".container").style.boxShadow = `0 0 40px ${theme.from}88`;
+      document.querySelector(".container").style.borderColor = `${theme.from}88`;
+    }
+
+    function toggleTheme() {
+      currentTheme = (currentTheme + 1) % themes.length;
+      applyTheme(themes[currentTheme]);
+    }
+
+    // Particles
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
+
+    const particles = [];
+
+    function createParticle() {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 5 + 1;
+      const size = Math.random() * 3 + 1;
+      particles.push({
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        size: size,
+        alpha: 1
+      });
+    }
+
+    function updateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= 0.01;
+        if (p.alpha <= 0) {
+          particles.splice(i, 1);
+        } else {
+          ctx.fillStyle = `rgba(0, 255, 255, ${p.alpha})`;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      requestAnimationFrame(updateParticles);
+    }
+
+    setInterval(createParticle, 10);
+    updateParticles();
+
+    window.addEventListener('resize', () => {
+      canvas.width = innerWidth;
+      canvas.height = innerHeight;
+    });
+  </script>
+</body>
+</html>
