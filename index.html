@@ -8,67 +8,85 @@
       box-sizing: border-box;
     }
 
-    body {
+    html, body {
       margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: radial-gradient(ellipse at center, #0f0f0f 0%, #000000 100%);
-      color: white;
-      height: 100vh;
+      background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
       overflow: hidden;
+    }
+
+    body {
       display: flex;
       align-items: center;
       justify-content: center;
-      background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+      position: relative;
     }
 
     h1, h2 {
-      font-size: 2.5rem;
-      margin-bottom: 10px;
+      font-size: 4vw;
+      margin: 0;
       text-shadow: 0 0 10px cyan;
+      text-align: center;
     }
 
-    #mainMenu, .submenu, #creditsScreen {
+    .screen {
       display: none;
-      flex-direction: column;
-      gap: 20px;
-      text-align: center;
-      align-items: center;
+      flex-wrap: wrap;
       justify-content: center;
-      height: 100%;
+      align-items: center;
       width: 100%;
+      height: 100%;
       position: absolute;
       top: 0;
       left: 0;
-      animation: fadeIn 1s ease forwards;
+      padding: 2vh 2vw;
     }
 
-    #mainMenu.active, #gamesMenu.active, #toolsMenu.active, #creditsScreen.active, #footballMenu.active {
+    .screen.active {
       display: flex;
     }
 
     .glass-panel {
       background: rgba(255, 255, 255, 0.05);
-      border-radius: 20px;
-      padding: 40px;
+      border-radius: 2vw;
+      padding: 2vw;
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.1);
       box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
-      transition: transform 0.3s ease;
-      max-width: 90%;
+      width: 100%;
+      max-width: 800px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    /* Enable scrolling for menus that may overflow */
+    #gamesMenu .glass-panel,
+    #toolsMenu .glass-panel {
+      overflow-y: auto;
     }
 
     button, .button-link {
-      padding: 12px 24px;
-      font-size: 1.1rem;
+      padding: 2vh 3vw;
+      font-size: 2vw;
+      margin: 1vh 0;
       cursor: pointer;
       border: none;
-      border-radius: 12px;
+      border-radius: 1vw;
       background: linear-gradient(135deg, #00eaff, #007bff);
       color: white;
       transition: 0.3s ease;
       box-shadow: 0 0 10px #00f0ff;
       text-decoration: none;
-      display: inline-block;
+      text-align: center;
+      width: 100%;
+      max-width: 400px;
     }
 
     button:hover, .button-link:hover {
@@ -89,7 +107,6 @@
     }
 
     #backButton {
-      margin-top: 20px;
       background: linear-gradient(135deg, #555, #222);
       box-shadow: 0 0 10px #444;
     }
@@ -100,8 +117,8 @@
 
     p, a {
       color: #ccc;
-      font-size: 1rem;
-      margin-top: 10px;
+      font-size: 1vw;
+      text-align: center;
     }
 
     a {
@@ -112,21 +129,41 @@
       text-decoration: underline;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
     @media (max-width: 600px) {
       h1, h2 {
-        font-size: 2rem;
+        font-size: 6vw;
       }
-      .glass-panel {
-        padding: 20px;
+
+      button, .button-link {
+        font-size: 4vw;
+        padding: 2vh 5vw;
+      }
+
+      p {
+        font-size: 3vw;
       }
     }
 
-    /* Tiny Preview Button */
+    #changelogBtn {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 1vw;
+      padding: 0.6vw 1.2vw;
+      border-radius: 1vw;
+      background: rgba(0, 255, 255, 0.1);
+      color: #00eaff;
+      text-decoration: none;
+      z-index: 1000;
+      box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+      transition: 0.2s ease;
+    }
+
+    #changelogBtn:hover {
+      background: rgba(0, 255, 255, 0.3);
+      color: white;
+    }
+
     #previewBtn {
       position: absolute;
       bottom: 5px;
@@ -146,7 +183,6 @@
       background: rgba(0, 255, 255, 0.2);
     }
   </style>
-
   <script>
     window.addEventListener('contextmenu', e => e.preventDefault());
     window.addEventListener('keydown', function(e) {
@@ -160,81 +196,75 @@
       }
     });
 
-    function showMenu(menuId) {
-      document.getElementById("mainMenu").classList.remove("active");
-      document.getElementById("gamesMenu").classList.remove("active");
-      document.getElementById("toolsMenu").classList.remove("active");
-      document.getElementById("creditsScreen").classList.remove("active");
-      document.getElementById("footballMenu").classList.remove("active");
-      document.getElementById(menuId).classList.add("active");
-    }
-
-    function goBack() {
-      document.getElementById("gamesMenu").classList.remove("active");
-      document.getElementById("toolsMenu").classList.remove("active");
-      document.getElementById("creditsScreen").classList.remove("active");
-      document.getElementById("footballMenu").classList.remove("active");
-      document.getElementById("mainMenu").classList.add("active");
-    }
-
-    function backToGames() {
-      document.getElementById("footballMenu").classList.remove("active");
-      document.getElementById("gamesMenu").classList.add("active");
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
     }
   </script>
 </head>
 <body>
+  <a id="changelogBtn" href="https://gigimeow.github.io/ClawTools/change-logs" target="_blank">📝 Change Logs</a>
+
   <!-- Main Menu -->
-  <div id="mainMenu" class="glass-panel active">
-    <h1>ClawTools Menu</h1>
-    <button onclick="showMenu('gamesMenu')">🎮 Games</button>
-    <button onclick="showMenu('toolsMenu')">🛠️ Tools</button>
-    <a class="button-link" href="https://gigimeow.github.io/ClawTools/quizzes" target="_blank">📚 Quizzes</a>
-    <button onclick="showMenu('creditsScreen')">⭐ Credits</button>
-    <p>Visit my friend's website of fun games: <a href="https://gamesrf.neocities.org/" target="_blank">Gamesrf</a></p>
+  <div id="mainMenu" class="screen active">
+    <div class="glass-panel">
+      <h1>ClawTools Menu</h1>
+      <button onclick="showScreen('gamesMenu')">🎮 Games</button>
+      <button onclick="showScreen('toolsMenu')">🛠️ Tools</button>
+      <a class="button-link" href="https://gigimeow.github.io/ClawTools/quizzes" target="_blank">📚 Quizzes</a>
+      <button onclick="showScreen('creditsScreen')">⭐ Credits</button>
+      <p>Visit my friend's site: <a href="https://gamesrf.neocities.org/" target="_blank">Gamesrf</a></p>
+    </div>
   </div>
 
   <!-- Games Menu -->
-  <div id="gamesMenu" class="submenu glass-panel">
-    <h2>🎮 Select a Game</h2>
-    <button onclick="showMenu('footballMenu')">⚽ Football Game</button>
-    <a class="button-link" href="https://gigimeow.github.io/ClawTools/shooter" target="_blank">🔫 Shooter Game</a>
-    <a class="button-link" href="https://gigimeow.github.io/ClawTools/platformergame" target="_blank">🕹️ Platformer Game</a>
-    <a class="button-link" href="https://gigimeow.github.io/ClawTools/galaxy" target="_blank">🌌 Galaxy Game</a>
-    <a class="button-link" href="https://gigimeow.github.io/ClawTools/minecraft" target="_blank">⛏️ Minecraft</a>
-    <a class="button-link" href="https://gigimeow.github.io/ClawTools/clawclicker" target="_blank">👈Clicker</a>
-    <a class="button-link" href="https://gigimeow.github.io/ClawTools/clawpong" target="_blank">⚽Pong</a>
-    <div class="button-link disabled-button">🧪 More coming soon!</div>
-    <button id="backButton" onclick="goBack()">⬅️ Back</button>
+  <div id="gamesMenu" class="screen">
+    <div class="glass-panel">
+      <h2>🎮 Select a Game</h2>
+      <button onclick="showScreen('footballMenu')">⚽ Football Game</button>
+      <a class="button-link" href="https://gigimeow.github.io/ClawTools/shooter" target="_blank">🔫 Shooter Game</a>
+      <a class="button-link" href="https://gigimeow.github.io/ClawTools/platformergame" target="_blank">🕹️ Platformer</a>
+      <a class="button-link" href="https://gigimeow.github.io/ClawTools/galaxy" target="_blank">🌌 Galaxy Game</a>
+      <a class="button-link" href="https://gigimeow.github.io/ClawTools/minecraft" target="_blank">⛏️ Minecraft</a>
+      <a class="button-link" href="https://gigimeow.github.io/ClawTools/clawclicker" target="_blank">👈 Clicker</a>
+      <a class="button-link" href="https://gigimeow.github.io/ClawTools/clawpong" target="_blank">🏓 Pong</a>
+      <div class="button-link disabled-button">🧪 More coming soon!</div>
+      <button id="backButton" onclick="showScreen('mainMenu')">⬅️ Back</button>
+    </div>
   </div>
 
-  <!-- Football Game Submenu -->
-  <div id="footballMenu" class="submenu glass-panel">
-    <h2>⚽ Football Game Versions</h2>
-    <a class="button-link" href="https://gigimeow.github.io/ClawTools/footballgame1" target="_blank">V1</a>
-    <a class="button-link" href="https://gigimeow.github.io/ClawTools/footballgame2" target="_blank">V2</a>
-    <button id="backButton" onclick="backToGames()">⬅️ Back to Games</button>
+  <!-- Football Submenu -->
+  <div id="footballMenu" class="screen">
+    <div class="glass-panel">
+      <h2>⚽ Football Game Versions</h2>
+      <a class="button-link" href="https://gigimeow.github.io/ClawTools/footballgame1" target="_blank">V1</a>
+      <a class="button-link" href="https://gigimeow.github.io/ClawTools/footballgame2" target="_blank">V2</a>
+      <button id="backButton" onclick="showScreen('gamesMenu')">⬅️ Back to Games</button>
+    </div>
   </div>
 
   <!-- Tools Menu -->
-  <div id="toolsMenu" class="submenu glass-panel">
-    <h2>🛠️ Select a Tool</h2>
-    <a class="button-link" href="https://gigimeow.github.io/ClawTools/paint" target="_blank">🎨 Paint</a>
-    <a class="button-link" href="https://gigimeow.github.io/ClawTools/notepad" target="_blank">📝 Notepad</a>
-    <a class="button-link" href="https://gigimeow.github.io/ClawTools/calculator" target="_blank">🧮 Calculator</a>
-    <a class="button-link" href="https://gigimeow.github.io/ClawTools/timer">⏱ Timer</a>
-
-    <button id="backButton" onclick="goBack()">⬅️ Back</button>
+  <div id="toolsMenu" class="screen">
+    <div class="glass-panel">
+      <h2>🛠️ Select a Tool</h2>
+      <a class="button-link" href="https://gigimeow.github.io/ClawTools/paint" target="_blank">🎨 Paint</a>
+      <a class="button-link" href="https://gigimeow.github.io/ClawTools/notepad" target="_blank">📝 Notepad</a>
+      <a class="button-link" href="https://gigimeow.github.io/ClawTools/calculator" target="_blank">🧮 Calculator</a>
+      <a class="button-link" href="https://gigimeow.github.io/ClawTools/timer" target="_blank">⏱ Timer</a>
+      <button id="backButton" onclick="showScreen('mainMenu')">⬅️ Back</button>
+    </div>
   </div>
 
-  <!-- Credits Screen -->
-  <div id="creditsScreen" class="submenu glass-panel">
-    <h2>⭐ Credits</h2>
-    <p>ClawTools made by <strong>Gigimeow1019</strong></p>
-    <button onclick="goBack()">⬅️ Back</button>
+  <!-- Credits -->
+  <div id="creditsScreen" class="screen">
+    <div class="glass-panel">
+      <h2>⭐ Credits</h2>
+      <p>ClawTools made by <strong>Gigimeow1019 (HN)</strong></p>
+      <button onclick="showScreen('mainMenu')">⬅️ Back</button>
+    </div>
   </div>
 
-  <!-- Hidden Preview Button -->
+  <!-- Preview Button -->
   <a id="previewBtn" href="https://gigimeow.github.io/ClawTools/Preview-auth" target="_blank">Preview</a>
 </body>
 </html>
