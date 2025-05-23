@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Epic Platformer - Henry's Game</title>
+<style>
+  /* Reset & basic styling */
+  body, html {
+    margin: 0; padding: 0; overflow: hidden;
+    background: linear-gradient(to top, #74ebd5 0%, #ACB6E5 100%);
+    user-select: none;
+  }
+  canvas {
+    display: block;
+    margin: 0 auto;
+    background: #87CEEB; /* Sky blue */
+    image-rendering: pixelated; /* crisp pixels */
+    touch-action: none;
+  }
+  /* UI buttons for touch */
+  #touch-controls {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 20px;
+    z-index: 1000;
+  }
+  .btn {
+    width: 70px;
+    height: 70px;
+    background: rgba(255 255 255 / 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    color: white;
+    user-select: none;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    transition: background 0.3s;
+    touch-action: manipulation;
+  }
+  .btn:active {
+    background: rgba(255 255 255 / 0.6);
+  }
+  #jump-btn {
+    background: #f39c12;
+  }
+  /* Info text */
+  #info {
+    position: fixed;
+    top: 5px; left: 5px;
+    color: white;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: bold;
+    text-shadow: 1px 1px 3px #000;
+    user-select: none;
+    z-index: 1000;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="game" width="800" height="450"></canvas>
+
+<div id="info">Collect coins and avoid enemies! Use arrows or touch buttons.</div>
+
+<!-- Touch controls -->
+<div id="touch-controls">
+  <div id="left-btn" class="btn">&#9664;</div>
+  <div id="jump-btn" class="btn">&#9650;</div>
+  <div id="right-btn" class="btn">&#9654;</div>
+</div>
+
+<script>
+// Disable right click menu
+window.addEventListener('contextmenu', e => e.preventDefault());
+
+// Canvas setup
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+
+const WIDTH = canvas.width;
+const HEIGHT = canvas.height;
+
+const GRAVITY = 0.6;
+const FRICTION = 0.85;
+
+// Player variables
+const player = {
+  x: 50,
+  y: 0,
+  width: 32,
+  height: 48,
+  color: '#FF4136',
+  dy: 0,
+  dx: 0,
+  speed: 3.5,
+  jumpPower: 12,
+  onGround: false,
+  frame: 0,
+  frameTick: 0,
+  frameMaxTick: 6,
+  direction: 1 // 1 = right, -1 = left
+};
+
+// Keyboard input state
+const keys = {
+  left: false,
+  right: false,
+  jump: false
+};
+
+// Touch input state
+const touchKeys = {
+  left: false,
+  right: false,
+  jump: false
+};
+
+// Load sprite sheet (pixel art style player)
+const playerSprite = new Image();
+playerSprite.src = 'https://i.imgur.com/GVtq3jK.png'; // small pixel player with 4 frames walking
+
+// Platforms (x, y, width, height)
+const platforms = [
+  {x: 0, y: 400, width: 800, height: 50},
+  {x: 150, y: 320, width: 120, height: 20},
+  {x: 350, y: 270, width: 100, height: 20},
+  {x: 500, y: 220, width: 140, height: 20},
+  {x: 700, y: 360, width: 80, height: 20}
+];
+
+// Moving platforms
+const movingPlatforms = [
+  {x: 200, y: 180, width: 100, height: 15, range: 120, speed: 2, dir: 1, baseX: 200}
+];
+
+// Coins to collect
+const coins = [
+  {x: 180, y: 280, collected: false},
+  {x: 390, y: 230, collected: false},
+  {x: 550, y: 170, collected: false},
+  {x: 720, y: 320, collected: false}
+];
+
+// Enemies
+const enemies = [
+  {x: 400, y: 370, width: 32, height: 32, dx: 1.5, range: [400, 520], dir: 1},
+  {x: 650, y: 370, width: 32, height: 32, dx: 2, range: [650, 730], dir: 1}
+];
+
+// Game variables
+let coinsCollected = 0;
+let gameOver = false;
+let win = false;
+
+// Animation loop
+function gameLoop() {
+  if (gameOver || win) {
+    drawEndScreen();
+    return;
+  }
+  
+  update();
+  draw();
+  requestAnimationFrame(gameLoop);
+}
+
+// Update logic
+function update() {
+  // Player horizontal movement
+  if ((keys.left || touchKeys.left) && ! (keys.right || touchKeys.right)) {
+    player.dx = -player.speed;
+    player.direction = -1;
+  } else if ((keys.right || touchKeys.right) && !(keys.left || touchKeys.left)) {
+    player.dx = player.speed;
+    player.direction = 1;
+  } else {
+    player.dx = 0;
+  }
+
+  // Jump logic
+  if ((keys.jump || touchKeys.jump) && player.onGround) {
+    player.dy = -player.jumpPower;
+    player.onGround = false;
+  }
+
+  // Apply gravity
+  player.dy += GRAVITY;
+
+  // Update player position
+  player.x += player.dx;
+  player.y += player.dy;
+
+  // Collision detection with platforms
+  player.onGround = false;
+
+  // Check moving platforms movement
+  movingPlatforms.forEach(p => {
+    p.x += p.speed * p.dir;
+    if (p.x > p.baseX + p.range || p.x < p.baseX) {
+      p.dir *= -1;
+    }
+  });
+
+  // Player vs static platforms
+  for (const plat of platforms) {
+    if (rectCollision(player.x, player.y, player.width, player.height, plat.x, plat.y, plat.width, plat.height)) {
+      // Collision from above
+      if (player.dy > 0 && player.y + player.height - player.dy <= plat.y) {
+        player.y = plat.y - player.height;
+        player.dy = 0;
+        player.onGround = true;
+      } else if (player.dy < 0 && player.y >= plat.y + plat.height) {
+        // head hit
+        player.y = plat.y + plat.height;
+        player.dy = 0;
+      } else if (player.dx > 0) {
+        player.x = plat.x - player.width;
+      } else if (player.dx < 0) {
+        player.x = plat.x + plat.width;
+      }
+    }
+  }
+
+  // Player vs moving platforms
+  for (const plat of movingPlatforms) {
+    if (rectCollision(player.x, player.y, player.width, player.height, plat.x, plat.y, plat.width, plat.height)) {
+      if (player.dy > 0 && player.y + player.height - player.dy <= plat.y) {
+        player.y = plat.y - player.height;
+        player.dy = 0;
+        player.onGround = true;
+        // Move player with platform
+        player.x += plat.speed * plat.dir;
+      }
+    }
+  }
+
+  // Boundaries
+  if (player.x < 0) player.x = 0;
+  if (player.x + player.width > WIDTH) player.x = WIDTH - player.width;
+  if (player.y > HEIGHT) gameOver = true; // fall off map = game over
+
+  // Animate player walking
+  if (player.dx !== 0 && player.onGround) {
+    player.frameTick++;
+    if (player.frameTick > player.frameMaxTick) {
+      player.frame = (player.frame + 1) % 4;
+      player.frameTick = 0;
+    }
+  } else {
+    player.frame = 0;
+  }
+
+  // Enemy movement
+  enemies.forEach(enemy => {
+    enemy.x += enemy.dx * enemy.dir;
+    if (enemy.x < enemy.range[0] || enemy.x + enemy.width > enemy.range[1]) {
+      enemy.dir *= -1;
+    }
+  });
+
+  // Player vs enemies collision
+  enemies.forEach(enemy => {
+    if (rectCollision(player.x, player.y, player.width, player.height, enemy.x, enemy.y, enemy.width, enemy.height)) {
+      gameOver = true;
+    }
+  });
+
+  // Collect coins
+  coins.forEach(coin => {
+    if (!coin.collected && rectCollision(player.x, player.y, player.width, player.height, coin.x, coin.y, 20, 20)) {
+      coin.collected = true;
+      coinsCollected++;
+      if (coinsCollected === coins.length) {
+        win = true;
+      }
+    }
+  });
+}
+
+// Draw everything
+function draw() {
+  ctx.clearRect(0, 0, WIDTH, HEIGHT);
+
+  // Background gradient (sky)
+  let gradient = ctx.createLinearGradient(0, 0, 0, HEIGHT);
+  gradient.addColorStop(0, '#74ebd5');
+  gradient.addColorStop(1, '#ACB6E5');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+  // Draw platforms
+  ctx.fillStyle = '#654321';
+  platforms.forEach(plat => {
+    ctx.fillRect(plat.x, plat.y, plat.width, plat.height);
+  });
+
+  // Draw moving platforms
+  ctx.fillStyle = '#886633';
+  movingPlatforms.forEach(plat => {
+    ctx.fillRect(plat.x, plat.y, plat.width, plat.height);
+  });
+
+  // Draw coins
+  coins.forEach(coin => {
+    if (!coin.collected) {
+      drawCoin(coin.x, coin.y);
+    }
+  });
+
+  // Draw enemies
+  enemies.forEach(enemy => {
+    ctx.fillStyle = '#900C3F';
+    ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+    // Eyes
+    ctx.fillStyle = 'white';
+    ctx.fillRect(enemy.x + 6, enemy.y + 8, 6, 6);
+    ctx.fillRect(enemy.x + 20, enemy.y + 8, 6, 6);
+    ctx.fillStyle = 'black';
+    ctx.fillRect(enemy.x + 8, enemy.y + 10, 2, 2);
+    ctx.fillRect(enemy.x + 22, enemy.y + 10, 2, 2);
+  });
+
+  // Draw player sprite
+  // sprite sheet: 4 frames in a row, each 32x48 px
+  ctx.save();
+  ctx.translate(player.x + player.width / 2, player.y + player.height / 2);
+  ctx.scale(player.direction, 1); // flip horizontally if facing left
+  ctx.drawImage(
+    playerSprite,
+    player.frame * 32, 0, 32, 48,
+    -player.width / 2, -player.height / 2, player.width, player.height
+  );
+  ctx.restore();
+
+  // Draw HUD - coins collected
+  ctx.fillStyle = 'yellow';
+  ctx.font = '20px Arial Black';
+  ctx.textShadow = '2px 2px 4px black';
+  ctx.fillText(`Coins: ${coinsCollected} / ${coins.length}`, 10, 30);
+}
+
+// Draw coin (simple gold coin with shine)
+function drawCoin(x, y) {
+  const radius = 10;
+  const cx = x + radius;
+  const cy = y + radius;
+  // base circle
+  let grad = ctx.createRadialGradient(cx, cy, 3, cx, cy, radius);
+  grad.addColorStop(0, '#FFD700');
+  grad.addColorStop(1, '#B8860B');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+  ctx.fill();
+
+  // shine
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  ctx.beginPath();
+  ctx.ellipse(cx - 3, cy - 3, 5, 7, Math.PI / 4, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+// Simple AABB collision
+function rectCollision(x1, y1, w1, h1, x2, y2, w2, h2) {
+  return !(x1 + w1 < x2 || x1 > x2 + w2 || y1 + h1 < y2 || y1 > y2 + h2);
+}
+
+// Draw game over or win screen
+function drawEndScreen() {
+  ctx.fillStyle = 'rgba(0,0,0,0.6)';
+  ctx.fillRect(0, 0, WIDTH, HEIGHT);
+  ctx.fillStyle = 'white';
+  ctx.textAlign = 'center';
+  ctx.font = '48px Arial Black';
+
+  if (win) {
+    ctx.fillText("You collected all coins! You win!", WIDTH / 2, HEIGHT / 2);
+  } else {
+    ctx.fillText("Game Over! Try again!", WIDTH / 2, HEIGHT / 2);
+  }
+}
+
+// Keyboard events
+window.addEventListener('keydown', e => {
+  if (e.code === 'ArrowLeft') keys.left = true;
+  if (e.code === 'ArrowRight') keys.right = true;
+  if (e.code === 'Space' || e.code === 'ArrowUp') keys.jump = true;
+});
+
+window.addEventListener('keyup', e => {
+  if (e.code === 'ArrowLeft') keys.left = false;
+  if (e.code === 'ArrowRight') keys.right = false;
+  if (e.code === 'Space' || e.code === 'ArrowUp') keys.jump = false;
+});
+
+// Touch controls event binding
+const leftBtn = document.getElementById('left-btn');
+const rightBtn = document.getElementById('right-btn');
+const jumpBtn = document.getElementById('jump-btn');
+
+function touchStartHandler(key) {
+  return e => {
+    e.preventDefault();
+    touchKeys[key] = true;
+  };
+}
+function touchEndHandler(key) {
+  return e => {
+    e.preventDefault();
+    touchKeys[key] = false;
+  };
+}
+
+leftBtn.addEventListener('touchstart', touchStartHandler('left'));
+leftBtn.addEventListener('touchend', touchEndHandler('left'));
+leftBtn.addEventListener('touchcancel', touchEndHandler('left'));
+
+rightBtn.addEventListener('touchstart', touchStartHandler('right'));
+rightBtn.addEventListener('touchend', touchEndHandler('right'));
+rightBtn.addEventListener('touchcancel', touchEndHandler('right'));
+
+jumpBtn.addEventListener('touchstart', touchStartHandler('jump'));
+jumpBtn.addEventListener('touchend', touchEndHandler('jump'));
+jumpBtn.addEventListener('touchcancel', touchEndHandler('jump'));
+
+// Also support mouse clicks on buttons (desktop)
+leftBtn.addEventListener('mousedown', touchStartHandler('left'));
+leftBtn.addEventListener('mouseup', touchEndHandler('left'));
+rightBtn.addEventListener('mousedown', touchStartHandler('right'));
+rightBtn.addEventListener('mouseup', touchEndHandler('right'));
+jumpBtn.addEventListener('mousedown', touchStartHandler('jump'));
+jumpBtn.addEventListener('mouseup', touchEndHandler('jump'));
+
+// Start game loop once sprite is loaded
+playerSprite.onload = () => {
+  gameLoop();
+};
+</script>
+
+</body>
+</html>
