@@ -304,6 +304,11 @@
       if (e.target.classList.contains("modal"))
         document.getElementById("licenseModal").style.display = "none";
     });
+
+    // Disable right-click
+document.addEventListener("contextmenu", function (e) {
+  e.preventDefault();
+});
   </script>
 </body>
 </html>
