@@ -1,1 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>☁️ClawCloud☁️</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #4ade80, #22d3ee);
+      margin: 0;
+      padding: 40px;
+      color: #1e293b;
+      text-align: center;
+      animation: fadeIn 1s ease;
+      position: relative;
+    }
 
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      font-size: 32px;
+      margin-bottom: 10px;
+      color: #0f172a;
+    }
+
+    input, button {
+      margin: 10px;
+      padding: 12px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    button {
+      background-color: #1d4ed8;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #2563eb;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+      max-width: 700px;
+      margin: 20px auto;
+      text-align: left;
+    }
+
+    li {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 0.5s ease;
+    }
+
+    .file-actions button {
+      margin-left: 10px;
+      background-color: #06b6d4;
+    }
+
+    .file-actions button:hover {
+      background-color: #0891b2;
+    }
+
+    .progress-container {
+      width: 90%;
+      max-width: 700px;
+      margin: 20px auto;
+      background: #f1f5f9;
+      border-radius: 10px;
+      overflow: hidden;
+      height: 30px;
+      box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(to right, #16a34a, #22c55e);
+      width: 0%;
+      transition: width 0.5s ease-in-out;
+    }
+
+    #storageInfo {
+      margin-top: 10px;
+      font-size: 16px;
+    }
+
+    .warning {
+      color: #dc2626;
+      font-weight: bold;
+      margin-top: 10px;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0.5; }
+    }
+
+    .upgrade-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 10px 16px;
+      font-weight: bold;
+      background: #f59e0b;
+    }
+
+    .upgrade-btn:hover {
+      background: #fbbf24;
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(30, 41, 59, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.3s ease;
+      z-index: 999;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      text-align: center;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal input {
+      width: 80%;
+      margin-top: 10px;
+      margin-bottom: 15px;
+    }
+
+    .error-msg {
+      color: #dc2626;
+      font-weight: bold;
+      animation: blink 1s infinite;
+    }
+  </style>
+</head>
+<body>
+  <button class="upgrade-btn" onclick="openModal()">Upgrade Storage</button>
+  <h2>📦 5MB File Storage</h2>
+  <p>Store your files in ClawCloud</p>
+  <input type="file" id="fileInput" />
+  <button onclick="saveFile()">Save File</button>
+
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+  <div id="storageInfo">Used: 0KB / 5MB (0%)</div>
+  <div id="warningMessage" class="warning" style="display:none;">⚠️ Out of storage! Please delete some files.</div>
+
+  <h3>📁 Stored Files</h3>
+  <ul id="fileList"></ul>
+
+  <!-- Modal -->
+  <div class="modal" id="licenseModal">
+    <div class="modal-content">
+      <h2>🔐 Enter License Key</h2>
+      <input type="text" id="licenseKey" placeholder="Enter key here..." />
+      <br />
+      <button onclick="submitLicense()">Submit</button>
+      <p class="error-msg" id="errorMsg" style="display:none;">❌ Invalid key. Try again.</p>
+    </div>
+  </div>
+
+  <script>
+    const DB_NAME = "FileStorageDB";
+    const DB_VERSION = 1;
+    const STORE_NAME = "files";
+    const MAX_STORAGE = 4.9 * 1024 * 1024;
+    let db;
+
+    const openRequest = indexedDB.open(DB_NAME, DB_VERSION);
+    openRequest.onupgradeneeded = e => {
+      db = e.target.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME, { keyPath: "name" });
+      }
+    };
+    openRequest.onsuccess = e => {
+      db = e.target.result;
+      updateFileList();
+    };
+    openRequest.onerror = e => {
+      alert("Database error: " + e.target.errorCode);
+    };
+
+    function saveFile() {
+      const file = document.getElementById("fileInput").files[0];
+      if (!file) return;
+
+      getUsedStorage().then(used => {
+        if (used + file.size > MAX_STORAGE) {
+          document.getElementById("warningMessage").style.display = "block";
+          return;
+        }
+
+        const tx = db.transaction(STORE_NAME, "readwrite");
+        const store = tx.objectStore(STORE_NAME);
+        store.put({ name: file.name, data: file });
+        tx.oncomplete = () => updateFileList();
+        tx.onerror = e => alert("Save error: " + e.target.error);
+      });
+    }
+
+    function updateFileList() {
+      const tx = db.transaction(STORE_NAME, "readonly");
+      const store = tx.objectStore(STORE_NAME);
+      const req = store.getAll();
+
+      req.onsuccess = () => {
+        const fileList = document.getElementById("fileList");
+        fileList.innerHTML = "";
+        let used = 0;
+
+        req.result.forEach(file => {
+          used += file.data.size;
+          const li = document.createElement("li");
+          li.innerHTML = `
+            <strong>${file.name}</strong> (${(file.data.size / 1024).toFixed(2)} KB)
+            <span class="file-actions">
+              <button onclick="downloadFile('${file.name}')">Download</button>
+              <button onclick="deleteFile('${file.name}')">Delete</button>
+            </span>
+          `;
+          fileList.appendChild(li);
+        });
+
+        const percent = (used / MAX_STORAGE) * 100;
+        document.getElementById("progressBar").style.width = percent.toFixed(1) + "%";
+        document.getElementById("storageInfo").innerText =
+          `Used: ${(used / 1024).toFixed(2)}KB / 5MB (${percent.toFixed(1)}%)`;
+        document.getElementById("warningMessage").style.display = used >= MAX_STORAGE ? "block" : "none";
+      };
+    }
+
+    function getUsedStorage() {
+      return new Promise(resolve => {
+        const tx = db.transaction(STORE_NAME, "readonly");
+        const store = tx.objectStore(STORE_NAME);
+        const req = store.getAll();
+        req.onsuccess = () => {
+          const used = req.result.reduce((sum, file) => sum + file.data.size, 0);
+          resolve(used);
+        };
+      });
+    }
+
+    function downloadFile(name) {
+      const tx = db.transaction(STORE_NAME, "readonly");
+      const store = tx.objectStore(STORE_NAME);
+      const req = store.get(name);
+      req.onsuccess = () => {
+        const blob = req.result.data;
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = name;
+        a.click();
+        URL.revokeObjectURL(url);
+      };
+    }
+
+    function deleteFile(name) {
+      const tx = db.transaction(STORE_NAME, "readwrite");
+      const store = tx.objectStore(STORE_NAME);
+      store.delete(name);
+      tx.oncomplete = () => updateFileList();
+    }
+
+    function openModal() {
+      document.getElementById("licenseModal").style.display = "flex";
+    }
+
+    function submitLicense() {
+      const key = document.getElementById("licenseKey").value;
+      document.getElementById("errorMsg").style.display = "block";
+    }
+
+    // Optional: Close modal on ESC or click outside
+    window.addEventListener("keydown", e => {
+      if (e.key === "Escape") document.getElementById("licenseModal").style.display = "none";
+    });
+    window.addEventListener("click", e => {
+      if (e.target.classList.contains("modal"))
+        document.getElementById("licenseModal").style.display = "none";
+    });
+  </script>
+</body>
+</html>
